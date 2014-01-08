@@ -1,0 +1,26 @@
+{
+    "name": "nifus/formbuilder",
+    "description": "",
+    "authors": [
+        {
+            "name": "nifus",
+            "email": "nifus@mail.ru"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "illuminate/support": "4.0.x"
+    },
+    "autoload": {
+        "classmap": [
+            "src/models",
+            "src/controllers",
+            "src/exceptions",
+            "src/extends"
+        ],
+        "psr-0": {
+            "Nifus\\Formbuilder": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
