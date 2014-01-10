@@ -6,9 +6,9 @@ class FormBuilder{
     static
     //$formCount = 0,
         $assetJs = [
-        'jquery' => null,
-        'require'=>null,
-        'engine'=>null
+            'jquery' => 1,
+            'require'=>1,
+            'engine'=>null
     ],
     $assetCss = [
 
