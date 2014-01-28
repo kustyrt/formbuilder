@@ -421,8 +421,10 @@ class FormBuilder{
                 }*/
                 $rows = $this->getResponseData($name);
                 $inc=[];
-                foreach($rows as $k=>$v) {
-                    $inc[]= [$key=>$v,$prime_key=>$id];
+                if ( is_array($rows) ){
+                    foreach($rows as $k=>$v) {
+                        $inc[]= [$key=>$v,$prime_key=>$id];
+                    }
                 }
                 $f->sync($inc);
 
