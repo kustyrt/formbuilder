@@ -54,7 +54,11 @@ class FormBuilder{
         $this->config['id'] = $this->nameForm;
         $this->config['render']['format'] = isset($this->config['render']['format']) ? $this->config['render']['format'] : 'table';
         foreach( $this->config['fields'] as $name=>$config){
-            $this->config['fields'][$name]['label'] = isset($config['label']) ? $config['label'] : trans($name);
+            $this->config['fields'][$name]['label'] =
+                isset($config['label'])
+                    ? $config['label'] :
+                        ( isset($config['title']) ? $config['title']  : trans($name));
+
             $this->config['fields'][$name]['type'] = isset($config['type']) ? $config['type'] : 'text';
             $this->config['fields'][$name]['id'] = isset($config['id']) ? $config['id'] : $this->nameForm . '_'.$this->clear($name);
             //$this->config['fields'][$name]['name'] = $this->nameForm . '_'.$name;
