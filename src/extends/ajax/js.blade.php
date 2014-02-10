@@ -1,26 +1,24 @@
 <script>
-    var options = {
-        @if ( false!==$formAction )
-        'action': '/contacts',
-        @endif
-        'dataType': 'json',
-        'type': 'post',
-        'success': function (json) {
-            if (json && json.error) {
-                $('#contactFormMessage').html(json.error);
-                $('form.contactForm [name=' + json.field + ']').focus();
+    $(document).ready(function() {
+        var options = {
+            'url': '{{$formAction}}',
+            'dataType': 'json',
+            'type': 'post',
+            'success': function (json) {
+                if (json && json.error) {
+                    $('#{{$formAction}}Message').html(json.error);
+                    $('form.{{$formAction}} [name=' + json.field + ']').focus();
+                }else {
+                    window.location.reload(true);
+                }
+            },
+            'error': function (event, jqXHR, ajaxSettings) {
+                //alert('Попробуйте еще раз!');
+                return false;
             }
-            else {
-                var msg = json.success || "Спасибо!";
-                $('form.contactForm').parent().append("<p class=\"thank\">" + msg + "</p>");
-                $('form.contactForm').remove();
-            }
-        },
-        'error': function (event, jqXHR, ajaxSettings) {
-            //alert('Попробуйте еще раз!');
-            return false;
         }
-    }
-    $("#{{$formName}}").ajaxForm(options);
+        $("#{{$formName}}").ajaxForm(options);
+    });
+
 
 </script>
