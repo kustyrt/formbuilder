@@ -13,6 +13,7 @@ class Field extends \Controller {
         if ( !class_exists($class) ){
             die();
         }
+
         $c = new $class;
         return $c->$action();
     }

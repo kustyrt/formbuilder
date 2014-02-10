@@ -1,3 +1,3 @@
 <?php
 
-\Route::any('/formbuilder/{ext}/{action}', 'Nifus\FormBuilder\Field@Index');
+\Route::any('/formbuilder/{ext}/{action}', ['uses'=>'Nifus\FormBuilder\Field@Index','as'=>'formBuilder']);

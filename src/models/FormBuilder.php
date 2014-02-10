@@ -7,7 +7,7 @@ class FormBuilder{
     //$formCount = 0,
         $assetJs = [
             'jquery' => null,
-            'require'=>null,
+            //'require'=>null,
             'engine'=>null
     ],
     $assetCss = [
@@ -116,7 +116,7 @@ class FormBuilder{
 
     protected function formRender($content){
 
-        $form=$this->setLine('<form method="'.$this->config['method'].'" id="'.$this->nameForm.'">');
+        $form=$this->setLine('<form enctype="multipart/form-data" method="'.$this->config['method'].'" id="'.$this->nameForm.'">');
         $form.=$content;
         $form .= $this->setLine('</form>');
 
@@ -179,9 +179,11 @@ class FormBuilder{
                 continue;
             }
             $fields = $class::fields($config);
-            foreach($fields as $k=>$v ){
-                if ( !is_null($v) ){
-                    $attrs.=$k.'="'.$v.'" ';
+            if ( sizeof($fields)>0 ){
+                foreach($fields as $k=>$v ){
+                    if ( !is_null($v) ){
+                        $attrs.=$k.'="'.$v.'" ';
+                    }
                 }
             }
 
@@ -192,6 +194,17 @@ class FormBuilder{
 
         switch($config['type']){
 
+
+            case('file'):
+                $value = $this->getData($name);
+                if ( !is_null($value) ){
+                    $attrs.='value="'.htmlspecialchars($value).'"';
+                }
+                return [
+                    'label'=>'<label for="'.$config['id'].'" >'.$config['label'].'</label>',
+                    'element'=>'<input type="file"  id="'.$config['id'].'"  '.$attrs.' />',
+                ];
+                break;
             case('text'):
                 $value = $this->getData($name);
                 if ( !is_null($value) ){
@@ -242,6 +255,18 @@ class FormBuilder{
                     'element'=>'<select '.$multi.' name="'.$config['name'].'" id="'.$config['id'].'" '.$attrs.'>'.$data.'</select>'
                 ];
                 break;
+            default:
+                if ( in_array($config['type'],$this->config['Extensions'] ) ){
+                    $class = 'Nifus\FormBuilder\\'.$config['type'].'Extension';
+                    if ( !class_exists($class) ){
+                        continue;
+                    }
+                    return $class::element($name,$config,$this,$attrs);
+                }else{
+                    die('Неизвестный тип:'.$config['type']);
+                }
+                //imageUpload
+                break;
         }
         return [];
     }
@@ -285,9 +310,13 @@ class FormBuilder{
                 preg_match_all('#\{([^}]*)\}#iUs',$config['value'],$find);
                 if (sizeof($find[1])>0){
                     $values=$find[1];
+                }else{
+                    $values=[$config['value']];
+                    $config['value']='{'.$config['value'].'}';
                 }
+            }else{
+                $values = ['title'];
             }
-
 
             $object = new $this->config['model'];
             $f = $object->$config['method']();
@@ -296,8 +325,9 @@ class FormBuilder{
 
                 //  получаем модель связанную
                 $related = $f->getRelated();
-                $key = $related->getForeignKey();
-                $values[]=$key;
+                $key = $related->getForeignKey();   //  ключ связь для основной таблицы
+                $mainKey = $related->getKeyName();
+                $values[]=$mainKey;
                 $order = [];
                 if ( !isset($config['sort']) ){
                     $order[$key]='ASC';
@@ -306,19 +336,24 @@ class FormBuilder{
                 }elseif( is_array($config['sort']) ){
                     die('сортировка по множественным параметрам не реализована');
                 }
+
+
+
                 $sql = $related;
                 foreach( $order as $orderKey=>$type ){
                     $sql->orderBy($orderKey,$type);
                 }
                 $items = $sql->get($values);
 
+
                 foreach($items as $item ){
-                    $selected = in_array($item->$key,$select) ? 'selected="selected"' : '';
+
+                    $selected = in_array($item->$mainKey,$select) ? 'selected="selected"' : '';
                     $value = $config['value'];
                     foreach($values as $sqlValue ){
                         $value = str_replace('{'.$sqlValue.'}',$item->$sqlValue,$value);
                     }
-                    $data.='<option '.$selected.' value="'.htmlspecialchars($item->$key).'">'.htmlspecialchars($value).'</option>';
+                    $data.='<option '.$selected.' value="'.htmlspecialchars($item->$mainKey).'">'.htmlspecialchars($value).'</option>';
                 }
 
                 //$related->
