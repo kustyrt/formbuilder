@@ -6,9 +6,12 @@
             'type': 'post',
             'success': function (json) {
                 if (json && json.error) {
-                    $('#{{$formAction}}Message').html(json.error);
+                    $('#{{$formName}}Message').html(json.error);
                     $('form.{{$formAction}} [name=' + json.field + ']').focus();
-                }else {
+                } else if (json && json.url) {
+                    window.location = json.url;
+                    //window.location.reload(true);
+                } else {
                     window.location.reload(true);
                 }
             },
@@ -19,6 +22,4 @@
         }
         $("#{{$formName}}").ajaxForm(options);
     });
-
-
 </script>
