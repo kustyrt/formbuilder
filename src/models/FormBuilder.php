@@ -6,7 +6,7 @@ class FormBuilder{
     static
     //$formCount = 0,
         $assetJs = [
-            'jquery' => null,
+            'jquery' => false,
             //'require'=>null,
             'engine'=>null
     ],
@@ -64,8 +64,7 @@ class FormBuilder{
             //$this->config['fields'][$name]['name'] = $this->nameForm . '_'.$name;
             $this->config['fields'][$name]['name'] = isset($config['name']) ? $config['name'] : $name ;
         }
-        self::$assetJs['jquery'] = (is_null(self::$assetJs['jquery'])) && !isset($this->config['jquery']) ? false : null;
-
+        self::$assetJs['jquery'] = (false===(self::$assetJs['jquery'])) && !isset($this->config['jquery']) ? false : null;
             //  расширения
         foreach( $this->config['Extensions'] as $ext ){
             $class = 'Nifus\FormBuilder\\'.$ext.'Extension';
@@ -571,11 +570,12 @@ class FormBuilder{
         foreach( self::$assetJs as $file=>$ext ){
             if ( is_null($ext) ){
                 $result .= \HTML::script(asset('packages/nifus/formbuilder/'.$file.'.js'));
+                self::$assetJs[$file]=false;
             }elseif(false===$ext){
                 continue;
             }else{
                 $result .= \HTML::script(asset('packages/nifus/formbuilder/'.$ext.'/'.$file.'.js'));
-
+                self::$assetJs[$file]=false;
             }
         }
         $result.=self::$staticJs."
