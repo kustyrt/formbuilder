@@ -38,14 +38,29 @@ $f->render()
 
 В массиве данных можно указывать следующие параметры:
 ```
-	method - post|get
-	action - null|URL адрес обработчка формы. Если null то форма будет отправлена по текущему 						адресу
-	ajax 	- null|Array[
-				url - null|адрес обработчика аякс запроса
-				]
+	method - null | post | get  
+		По умолчанию post
+
+	enctype  - null | application/x-www-form-urlencoded | multipart/form-data | text/plain
+		По умолчанию multipart/form-data
+
+	action -  null | URL 
+		адрес обработчка формы. 
+		Если null то форма будет отправлена по текущему адресу
+
 	render 	- null | Array[
 				format - array|table|ul
-				]  - формат вывода формы.
-	Extensions  - null | Array 
+			]  
+		Формат вывода формы. 
+		По умолчанию array.
+
+
+	extensions  - null | Array 
+		список расширений подключаемых для генерации формы
+
+	fields - Array
+		Список полей формы
+
+	Также есть целый ряд ключей которые используются расширениями для модификации формы
 ```
 
