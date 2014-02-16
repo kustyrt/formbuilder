@@ -67,9 +67,15 @@ class Form{
 
 
     public function setFields(array $fields){
+        $fieldsConfig=[];
         foreach( $fields as $field ){
-            dd($field);
-            $this->form->setFieldConfig($field->getName(),$field->getConfig());
+            $config = $field->getConfig();
+            list($name,$config)= each($config);
+            if ( isset($fieldsConfig[$name]) ){
+                throw new ConfigException(' name:' . $name.' уже было определено ранее');
+
+            }
+            $this->form->setFieldConfig($name,$config);
         }
         return $this;
     }

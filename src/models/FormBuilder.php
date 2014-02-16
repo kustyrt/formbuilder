@@ -2,10 +2,11 @@
 
 namespace Nifus\FormBuilder;
 
-class FormBuilder{
+class FormBuilder
+{
 
     public
-        $config,$errors = [];
+        $config, $errors = [];
     protected
         $model = false,
         $modelKey = false,
@@ -15,8 +16,9 @@ class FormBuilder{
      *
      * @param $nameForm
      */
-    public function __construct( $nameForm){
-        $this->nameForm=$nameForm;
+    public function __construct($nameForm)
+    {
+        $this->nameForm = $nameForm;
     }
 
     /**
@@ -24,42 +26,43 @@ class FormBuilder{
      * @param array $config
      * @return Form
      */
-    static function create($nameForm,$config=array()){
+    static function create($nameForm, $config = array())
+    {
         $builder = new self($nameForm);
         $builder->setConfig($config);
-        return new Form( $config,$builder );
+        return new Form($config, $builder);
     }
-
     /**
-     *
-     * @param $name
+     * @param $type
      * @param array $config
-     * @return Fields
+     * @param string $name
+     * @return Fields|InputText
+     * @throws ConfigException
      */
-    static function createField($name,array $config=[]){
-        return Fields::create($name, $config);
+    static function createField($type='text', array $config = [], $name = '')
+    {
+        $class = 'Nifus\FormBuilder\\Input' . ucfirst($type);
+        if (!class_exists($class)) {
+            throw new ConfigException('Не найден класс ' . $class);
+        }
+        return new $class($name, $config);
     }
-
-
-    public function setId($id){
-        $this->modelKey = $id;
-    }
-
 
     /**
      * @param array $config
      * @return Form
      */
-    public function setConfig(array $config=[]){
-        if ( !is_array($config) ){
+    public function setConfig(array $config = [])
+    {
+        if (!is_array($config)) {
             //throw new ConfigException('Неправильный конфиг');
         }
-            //  настройки формы
-        $config = $this->setDefaultConfig( $config  );
+        //  настройки формы
+        $config = $this->setDefaultConfig($config);
 
-            //  настройки полей
-        $this->config = $this->setDefaultFieldsConfig( $config );
-        return new Form( $this->config,$this );
+        //  настройки полей
+        $this->config = $this->setDefaultFieldsConfig($config);
+        return new Form($this->config, $this);
     }
 
     /**
@@ -67,15 +70,16 @@ class FormBuilder{
      *
      * @param $config
      */
-    protected function setDefaultConfig($config){
-            //  одна или много ошибок
+    protected function setDefaultConfig($config)
+    {
+        //  одна или много ошибок
         $config['singleError'] = isset($config['singleError']) ? $config['singleError'] : true;
 
-            //  установим параметры относящиеся к форме
-        new Form($config,$this);
+        //  установим параметры относящиеся к форме
+        new Form($config, $this);
 
 
-            //  формат вывода формы
+        //  формат вывода формы
         $config['render'] = (isset($config['render']) && is_array($config['render'])) ? $config['render'] : [];
         $config['render']['format'] = isset($config['render']['format']) ? $config['render']['format'] : 'array';
 
@@ -88,21 +92,22 @@ class FormBuilder{
      * @return mixed
      * @throws ConfigException
      */
-    protected function setDefaultFieldsConfig($config){
-        if ( !is_array($config) ){
+    protected function setDefaultFieldsConfig($config)
+    {
+        if (!is_array($config)) {
             throw new ConfigException('Пустой массив fields');
         }
-        if ( !isset($config['fields']) ){
+        if (!isset($config['fields'])) {
             return $config;
         }
-        foreach( $config['fields'] as $name=>$config){
+        foreach ($config['fields'] as $name => $config) {
             // тип элемента
             $type = isset($config['type']) ? 'text' : $config['type'];
-            $class = 'Nifus\FormBuilder\\Input'.camelCase($type);
-            if ( !class_exists($class) ){
-                throw new ConfigException('Не найден класс '.$class);
+            $class = 'Nifus\FormBuilder\\Input' . camelCase($type);
+            if (!class_exists($class)) {
+                throw new ConfigException('Не найден класс ' . $class);
             }
-            $field = new $class($config,$this);
+            $field = new $class($config, $this);
             $field->setDefaultConfig();
         }
         return $config;
@@ -110,44 +115,48 @@ class FormBuilder{
 
 
 
+    public function setId($id)
+    {
+        $this->modelKey = $id;
+    }
+
     /**
      * Выдаём результат
      *
      * @return array|string
      * @throws ConfigException
      */
-    public function render(){
-        $render  = new Render($this->config,$this);
+    public function render()
+    {
+        $render = new Render($this->config, $this);
         return $render->render();
     }
 
-
-    public function errors(){
-        if ( $this->config['singleError'] ){
+    public function errors()
+    {
+        if ($this->config['singleError']) {
             return array_shift($this->errors);
         }
         return $this->errors;
     }
 
-
-
     /**
      *  обработка формы
      */
-    function save(){
-        $response  = new Response($this->config);
+    function save()
+    {
+        $response = new Response($this->config);
         return $response->save();
     }
-
-
 
     /**
      * Меняем конфиг формы
      * @param $key
      * @param $value
      */
-    public function setFormConfig($key,$value){
-        $this->config[$key]=$value;
+    public function setFormConfig($key, $value)
+    {
+        $this->config[$key] = $value;
     }
 
     /**
@@ -155,11 +164,10 @@ class FormBuilder{
      * @param $field
      * @param $config
      */
-    function setFieldConfig($field,$config){
-        $this->config['fields'][$field]=$config;
+    function setFieldConfig($field, $config)
+    {
+        $this->config['fields'][$field] = $config;
     }
-
-
 
 
 }

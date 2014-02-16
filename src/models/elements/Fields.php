@@ -8,17 +8,13 @@ class Fields
         $config = [],
         $name;
 
-    public function __construct($config){
+    public function __construct($name='',array $config){
         $def = $this->getDefaultConfig();
         $this->config = array_merge($def,$config);
-
+        $this->name = $name;
     }
 
-    static function create($name,array $config){
-        $field = new self($config);
-        $field->name = $name;
-        return $field;
-    }
+
 
     protected function getDefaultConfig()
     {
@@ -28,6 +24,7 @@ class Fields
     public function setLabel($label)
     {
         $this->config['label'] =  $label ;
+        return $this;
     }
 
     public function setId($id)
@@ -44,13 +41,18 @@ class Fields
     public function setName($name)
     {
         $this->config['name'] = $name;
+        $this->name = $name;
+        return $this;
     }
 
     public function getName(){
         return $this->name;
     }
     public function getConfig(){
-        return $this->config;
+
+        //  подключаем правила доп полей.
+
+        return [$this->name=>$this->config];
     }
 
 
