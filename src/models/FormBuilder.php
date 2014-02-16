@@ -19,6 +19,27 @@ class FormBuilder{
         $this->nameForm=$nameForm;
     }
 
+    /**
+     * @param $nameForm
+     * @param array $config
+     * @return Form
+     */
+    static function create($nameForm,$config=array()){
+        $builder = new self($nameForm);
+        $builder->setConfig($config);
+        return new Form( $config,$builder );
+    }
+
+    /**
+     *
+     * @param $name
+     * @param array $config
+     * @return Fields
+     */
+    static function createField($name,array $config=[]){
+        return Fields::create($name, $config);
+    }
+
 
     public function setId($id){
         $this->modelKey = $id;
@@ -27,19 +48,18 @@ class FormBuilder{
 
     /**
      * @param array $config
-     * @return bool
-     * @throws ConfigException
+     * @return Form
      */
-    public function setConfig(array $config){
+    public function setConfig(array $config=[]){
         if ( !is_array($config) ){
-            throw new ConfigException('Неправильный конфиг');
+            //throw new ConfigException('Неправильный конфиг');
         }
             //  настройки формы
         $config = $this->setDefaultConfig( $config  );
 
             //  настройки полей
         $this->config = $this->setDefaultFieldsConfig( $config );
-        return true;
+        return new Form( $this->config,$this );
     }
 
     /**
@@ -51,28 +71,39 @@ class FormBuilder{
             //  одна или много ошибок
         $config['singleError'] = isset($config['singleError']) ? $config['singleError'] : true;
 
-        $form = new Form($config,$this);
-        $form
-            ->setId($config['id'])
-            ->setMethod($config['method'])
-            ->setEnctype($config['enctype']);
+            //  установим параметры относящиеся к форме
+        new Form($config,$this);
+
 
             //  формат вывода формы
-        $config['render'] = (is_array($config['render'])) ? $config['render'] : [];
+        $config['render'] = (isset($config['render']) && is_array($config['render'])) ? $config['render'] : [];
         $config['render']['format'] = isset($config['render']['format']) ? $config['render']['format'] : 'array';
 
         return $config;
     }
 
+    /**
+     * Устанавливаем значения по-умолчанию для полей формы
+     * @param $config
+     * @return mixed
+     * @throws ConfigException
+     */
     protected function setDefaultFieldsConfig($config){
         if ( !is_array($config) ){
             throw new ConfigException('Пустой массив fields');
         }
+        if ( !isset($config['fields']) ){
+            return $config;
+        }
         foreach( $config['fields'] as $name=>$config){
-            $fields = $this->config['fields'][$name];
-
-
-
+            // тип элемента
+            $type = isset($config['type']) ? 'text' : $config['type'];
+            $class = 'Nifus\FormBuilder\\Input'.camelCase($type);
+            if ( !class_exists($class) ){
+                throw new ConfigException('Не найден класс '.$class);
+            }
+            $field = new $class($config,$this);
+            $field->setDefaultConfig();
         }
         return $config;
     }
@@ -108,13 +139,7 @@ class FormBuilder{
         return $response->save();
     }
 
-    /**
-     * Создаём форму
-     * @return Form
-     */
-    function form(){
-        return new Form( $this->config,$this );
-    }
+
 
     /**
      * Меняем конфиг формы
@@ -133,6 +158,7 @@ class FormBuilder{
     function setFieldConfig($field,$config){
         $this->config['fields'][$field]=$config;
     }
+
 
 
 

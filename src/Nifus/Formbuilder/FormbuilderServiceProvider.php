@@ -18,6 +18,10 @@ class FormbuilderServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
+        $this->app['FormBuilder'] = $this->app->share(function($app)
+        {
+            //return new \NIfus\FormBuilder\FormBuilder;
+        });
        // $this->app['config']->package( "nifus/formbuilder", dirname( __FILE__ ) . "/../../../config" );
     }
 

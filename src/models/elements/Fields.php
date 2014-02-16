@@ -2,26 +2,56 @@
 
 namespace Nifus\FormBuilder;
 
-class Fields extends Form{
+class Fields
+{
+    protected
+        $config = [],
+        $name;
 
-   public function setLabel(){
-       $fields['label'] = isset($fields['label']) ? $fields['label'] :
-           ( isset($fields['title']) ? $fields['title']  : trans($name));
-   }
-
-    public function setId(){
-        $fields['id'] = isset($fields['id']) ? $fields['id'] : $this->nameForm . '_'.$this->clear($name);
-
-    }
-
-    public function setType(){
-        $fields['type'] = isset($fields['type']) ? $fields['type'] : 'text';
+    public function __construct($config){
+        $def = $this->getDefaultConfig();
+        $this->config = array_merge($def,$config);
 
     }
 
-    public function setName(){
-        $fields['name'] = isset($fields['name']) ? $fields['name'] : $name ;
+    static function create($name,array $config){
+        $field = new self($config);
+        $field->name = $name;
+        return $field;
+    }
 
+    protected function getDefaultConfig()
+    {
+        return [];
+    }
+
+    public function setLabel($label)
+    {
+        $this->config['label'] =  $label ;
+    }
+
+    public function setId($id)
+    {
+        $this->config['id'] =  $id ;
+    }
+
+    public function setType($type)
+    {
+        $this->config['type'] =  $type ;
 
     }
+
+    public function setName($name)
+    {
+        $this->config['name'] = $name;
+    }
+
+    public function getName(){
+        return $this->name;
+    }
+    public function getConfig(){
+        return $this->config;
+    }
+
+
 }
