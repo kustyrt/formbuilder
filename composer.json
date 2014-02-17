@@ -13,10 +13,11 @@
     "autoload": {
         "classmap": [
             "src/models",
-            "src/models/elements",
+            "src/fields",
             "src/controllers",
             "src/exceptions",
-            "src/extends"
+            "src/extends",
+            "src/extensions"
         ],
         "psr-0": {
             "Nifus\\Formbuilder": "src/"

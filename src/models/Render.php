@@ -18,35 +18,24 @@ class Render{
         $assetCss = [],
         $staticJs = '';
 
-    protected $config=[];
+    protected
+        $config=[];
+    private
+        $builder = false;
 
 
-    function __construct($config,$form){
-        $this->$config = $config;
-        $this->form = $form;
+    public function __construct($config,$builder){
+
+        $this->config = $config;
+        $this->builder = $builder;
 
         self::$assetJs['jquery'] = (false===(self::$assetJs['jquery'])) && !isset($this->config['jquery']) ? false : null;
-
         if ( isset($this->config['ajax'])  ){
             self::jsAdd('jquery.form');
         }
-        $this->autoloadExtensions(  );
+        $this->loadExtensions(  );
     }
 
-
-    /**
-     * Загружаем расширения
-     */
-    protected function autoloadExtensions(){
-
-        foreach( $this->config['extensions'] as $ext ){
-            $class = 'Nifus\FormBuilder\\'.$ext.'Extension';
-            if ( !class_exists($class) ){
-                throw new RenderException('Не найден класс '.$class);
-            }
-            $class::autoload($this);
-        }
-    }
 
 
 
@@ -64,6 +53,7 @@ class Render{
             case('dev'):
                 break;
             case('array'):
+                dd($this->arrayRender());
                 return [
                     'fields' => $this->arrayRender(),
                     'js'=>$this->jsRender(),
@@ -74,6 +64,23 @@ class Render{
             default:
                 throw new ConfigException(' Неправильный формат вывода '.$this->config['render']['format'] );
                 break;
+        }
+    }
+
+
+    /**
+     * Загружаем расширения
+     */
+    protected function loadExtensions(){
+
+        foreach( $this->config['extensions'] as $ext ){
+            $class = 'Nifus\FormBuilder\Extensions\\'.$ext;
+            if ( !class_exists($class) ){
+                throw new RenderException('Не найден класс '.$class);
+            }
+            $ext = new $class($this->config,$this->builder,$this);
+            $ext->loadAsset();
+            //$class::autoload($this);
         }
     }
 
@@ -181,49 +188,27 @@ class Render{
     }
 
     /**
-     * Собираем элемент из его характеристик
      * @param $name
      * @param $config
      * @return array
+     * @throws RenderException
      */
     protected function elementRender($name,$config){
+        $response = $this->builder->getResponse();
 
 
-
-        $attrs = '';
-        foreach($config as $k=>$v ){
-            if ( !in_array($k,['title','id','type','name','style','value' ]) ){
-                continue;
-            }
-            if ( !is_null($v) ){
-                $attrs.=$k.'="'.$v.'" ';
-            }
+        $class = 'Nifus\FormBuilder\Elements\\'.ucfirst($config['type']);
+        if ( !class_exists($class) ){
+            throw new RenderException('Не найден класс '.$class);
         }
-        //  load
-        foreach( $this->config['Extensions'] as $ext ){
-            $class = 'Nifus\FormBuilder\\'.$ext.'Extension';
-            if ( !class_exists($class) ){
-                continue;
-            }
-            $fields = $class::fields($config);
-            if ( sizeof($fields)>0 ){
-                foreach($fields as $k=>$v ){
-                    if ( !is_null($v) ){
-                        $attrs.=$k.'="'.$v.'" ';
-                    }
-                }
-            }
-
-        }
-
-
-
-
+        $element = new $class($name,$config);
+        return ['label'=>$element->renderLabel(),'element'=>$element->renderElement($response)];
+        /*
         switch($config['type']){
 
 
             case('file'):
-                $value = $this->getData($name);
+                $value = $response->getData($name);
                 if ( !is_null($value) ){
                     $attrs.='value="'.htmlspecialchars($value).'"';
                 }
@@ -295,7 +280,7 @@ class Render{
                 //imageUpload
                 break;
         }
-        return [];
+        return [];*/
     }
 
     function isMultiple($config){
@@ -435,10 +420,7 @@ class Render{
     protected function setLine($str){
         return $str."\n";
     }
-    protected function clear($str){
-        return strtolower(preg_replace('#[^a-z]#i','',$str));
 
-    }
 
 
 

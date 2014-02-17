@@ -5,12 +5,14 @@ namespace Nifus\FormBuilder;
 class FormBuilder
 {
 
-    public
-        $config, $errors = [];
+
+
     protected
+        $config=[],$errors = [],
         $model = false,
         $modelKey = false,
-        $nameForm = false;
+        $nameForm = false,
+        $response = false;
 
     /**
      *
@@ -19,6 +21,7 @@ class FormBuilder
     public function __construct($nameForm)
     {
         $this->nameForm = $nameForm;
+        $this->response = new Response();
     }
 
     /**
@@ -30,7 +33,7 @@ class FormBuilder
     {
         $builder = new self($nameForm);
         $builder->setConfig($config);
-        return new Form($config, $builder);
+        return new Form($builder);
     }
     /**
      * @param $type
@@ -45,7 +48,8 @@ class FormBuilder
         if (!class_exists($class)) {
             throw new ConfigException('Не найден класс ' . $class);
         }
-        return new $class($name, $config);
+        $class = new $class($name, $config);
+        return $class->setType($type);
     }
 
     /**
@@ -54,15 +58,17 @@ class FormBuilder
      */
     public function setConfig(array $config = [])
     {
+
         if (!is_array($config)) {
             //throw new ConfigException('Неправильный конфиг');
         }
+
         //  настройки формы
         $config = $this->setDefaultConfig($config);
 
         //  настройки полей
         $this->config = $this->setDefaultFieldsConfig($config);
-        return new Form($this->config, $this);
+       // return new Form($this->config, $this);
     }
 
     /**
@@ -76,7 +82,7 @@ class FormBuilder
         $config['singleError'] = isset($config['singleError']) ? $config['singleError'] : true;
 
         //  установим параметры относящиеся к форме
-        new Form($config, $this);
+        new Form($this);
 
 
         //  формат вывода формы
@@ -169,5 +175,12 @@ class FormBuilder
         $this->config['fields'][$field] = $config;
     }
 
-
+    public function getConfig()
+    {
+        return $this->config;
+    }
+    public function getResponse()
+    {
+        return $this->response;
+    }
 }
