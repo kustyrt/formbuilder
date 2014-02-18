@@ -192,18 +192,19 @@ class FormBuilder
             $field = new $class($name, $config);
             $config = $field->getConfig();
             list($name,$config)= each($config);
-            foreach ($extConfig as $ext) {
-                $class = 'Nifus\FormBuilder\Extensions\\' . $ext . '';
-                if (!class_exists($class)) {
-                    throw new ConfigException('Не найден класс ' . $class);
+            if ( !is_null($extConfig) ){
+                foreach ($extConfig as $ext) {
+                    $class = 'Nifus\FormBuilder\Extensions\\' . $ext . '';
+                    if (!class_exists($class)) {
+                        throw new ConfigException('Не найден класс ' . $class);
+                    }
+                    $ext = new $class($this->config, $this, null);
+                    $f_config = $ext->configField($config);
+                    if (!is_array($config)) {
+                        throw new ConfigException('Расширение ' . $class . ' должно возвращать массив');
+                    }
+                    $config = array_merge($f_config,$config  );
                 }
-                $ext = new $class($this->config, $this, null);
-                $f_config = $ext->configField($config);
-                if (!is_array($config)) {
-                    throw new ConfigException('Расширение ' . $class . ' должно возвращать массив');
-                }
-                $config = array_merge($f_config,$config  );
-
             }
             $this->setFieldConfig($name,$config);
 
