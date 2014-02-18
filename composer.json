@@ -13,7 +13,7 @@
     "autoload": {
         "classmap": [
             "src/classes",
-            "src/controllers",
+            "src/controllers"
         ],
         "psr-0": {
             "Nifus\\Formbuilder": "src/"
