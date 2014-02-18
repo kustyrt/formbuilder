@@ -11,13 +11,18 @@ class Fields
     public function __construct($name='',array $config){
         $def = $this->getDefaultConfig();
         $this->config = array_merge($def,$config);
-        $this->name = $name;
+        if ( isset($name) ){
+            $this->setName($name);
+        }
     }
 
 
 
     protected function getDefaultConfig()
     {
+        if ( !isset($this->config['type']) ){
+            return ['type'=>'text'];
+        }
         return [];
     }
 
@@ -82,7 +87,7 @@ class Fields
         if ( !is_null($value) ){
             $attrs.='value="'.htmlspecialchars($value).'"';
         }
-        return '<input type="'.$this->config['type'].'"  id="'.$this->config['id'].'"  '.$attrs.' />';
+        return '<input '.$attrs.' />';
     }
 
     protected function clear($str){

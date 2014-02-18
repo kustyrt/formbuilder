@@ -12,12 +12,8 @@
     },
     "autoload": {
         "classmap": [
-            "src/models",
-            "src/fields",
+            "src/classes",
             "src/controllers",
-            "src/exceptions",
-            "src/extends",
-            "src/extensions"
         ],
         "psr-0": {
             "Nifus\\Formbuilder": "src/"

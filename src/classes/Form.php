@@ -92,6 +92,7 @@ class Form{
                 }
                 $ext = new $class($fullConfig,$this->builder,$this);
                 $f_config = $ext->configField($config);
+
                 if ( !is_array($f_config) ){
                     throw new ConfigException('Расширение '.$class.' должно возвращать массив');
                 }

@@ -4,7 +4,5 @@ namespace Nifus\FormBuilder\Fields;
 
 class Text extends \Nifus\FormBuilder\Fields{
 
-    function getsss(){
 
-    }
 }

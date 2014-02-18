@@ -4,12 +4,17 @@ namespace Nifus\FormBuilder;
 
 class Response{
 
+    private  $builder;
+
+    function __construct($builder){
+        $this->builder = $builder;
+    }
     /**
      *
      */
     function save(){
 
-        $id = $this->getResponseData( $this->nameForm.'_formbuilderid' );
+        $id = $this->getResponseData( $this->builder->nameForm.'_formbuilderid' );
 
         if ( !is_null($id) ){
             $model = $this->config['model'];
@@ -92,8 +97,8 @@ class Response{
 
 
     protected function getResponseData($key){
-
-        switch($this->config['method']){
+        $config= $this->builder->getConfig('method');
+        switch($config){
             case('post'):
                 return (isset($_POST[$key])) ? $_POST[$key] : null;
                 break;
@@ -104,11 +109,12 @@ class Response{
     }
 
     protected function getModelData($key){
-        if ( !isset($this->config['model']) ){
+        $model= $this->builder->getConfig('model');
+        if ( is_null($model) ){
             return null;
         }
-        if ( false===$this->model ){
-            $model =  $this->config['model'];
+
+       /* if ( false===$this->model ){
             $model = $model::find($this->modelKey);
             if ( is_null($model) ){
                 return null;
@@ -124,14 +130,14 @@ class Response{
 
             }
         }
-        return $this->model->$key;
+        return $this->model->$key;*/
 
     }
 
 
 
 
-    protected function getData($key){
+    public function getData($key){
         if ( $this->isSubmit() ){
             return $this->getResponseData($key);
         }else{
@@ -139,7 +145,12 @@ class Response{
         }
 
     }
-
+    /**
+     * Проверяем отправку формы
+     */
+    public function isSubmit(){
+        return !is_null($this->getResponseData( $this->builder->getNameForm().'_formbuildersubmit') ) ? true : false;
+    }
 
 
 

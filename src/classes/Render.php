@@ -53,13 +53,15 @@ class Render{
             case('dev'):
                 break;
             case('array'):
-                dd($this->arrayRender());
-                return [
+                $view = new RenderView($this->arrayRender(),$this->jsRender(),$this->cssRender());
+
+                return $view;
+                    /*[
                     'fields' => $this->arrayRender(),
-                    'js'=>$this->jsRender(),
-                    'css'=>$this->cssRender(),
-                    'errors'=>$this->errors(),
-                ];
+                    'js'=>,
+                    'css'=>,
+                    //'errors'=>$this->errors(),
+                ];*/
                 break;
             default:
                 throw new ConfigException(' Неправильный формат вывода '.$this->config['render']['format'] );
@@ -72,7 +74,9 @@ class Render{
      * Загружаем расширения
      */
     protected function loadExtensions(){
-
+        if ( !isset($this->config['extensions']) ){
+            return false;
+        }
         foreach( $this->config['extensions'] as $ext ){
             $class = 'Nifus\FormBuilder\Extensions\\'.$ext;
             if ( !class_exists($class) ){
@@ -82,6 +86,7 @@ class Render{
             $ext->loadAsset();
             //$class::autoload($this);
         }
+        return true;
     }
 
 
@@ -115,11 +120,12 @@ class Render{
         }
         $result.=self::$staticJs."
 <script>$(document).ready(function() {
-   $('#".$this->nameForm."').append($('<input type=\"hidden\" name=\"".$this->nameForm."_formbuildersubmit\" value=\"1\">'));
+   $('#".$this->builder->getNameForm()."').append($('<input type=\"hidden\" name=\"".$this->builder->getNameForm()."_formbuildersubmit\" value=\"1\">'));
    ";
+        /*
         if ( false!=$this->modelKey ){
             $result.="$('#".$this->nameForm."').append($('<input type=\"hidden\" name=\"".$this->nameForm."_formbuilderid\" value=\"".$this->modelKey."\">'));";
-        }
+        }*/
         $result.="
 });
 </script>";
@@ -197,7 +203,7 @@ class Render{
         $response = $this->builder->getResponse();
 
 
-        $class = 'Nifus\FormBuilder\Elements\\'.ucfirst($config['type']);
+        $class = 'Nifus\FormBuilder\Fields\\'.ucfirst($config['type']);
         if ( !class_exists($class) ){
             throw new RenderException('Не найден класс '.$class);
         }
@@ -407,12 +413,7 @@ class Render{
         return $data;
     }
 
-    /**
-     * Проверяем отправку формы
-     */
-    public function isSubmit(){
-        return !is_null($this->getResponseData( $this->nameForm.'_formbuildersubmit') ) ? true : false;
-    }
+
 
 
     //  inline method
