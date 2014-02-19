@@ -35,6 +35,29 @@ class Form{
     }
 
 
+    /**
+     * @param  $format
+     * @param array $config
+     * @return $this
+     */
+    public function setRender($format,$config=[]){
+        $config = array_merge($config,['format'=>$format]);
+        $this->setConfig('render',$config);
+        return $this;
+    }
+
+    /**
+     * @param bool $flag
+     * @return $this
+     */
+    public function setJquery($flag){
+        if ( true===$flag){
+            Render::$assetJs['jquery']=null;
+        }else{
+            Render::$assetJs['jquery']=false;
+        }
+        return $this;
+    }
     public  function setMethod($method){
         if ( empty($method) ){
             $method = 'post';
@@ -92,11 +115,11 @@ class Form{
                 }
                 $ext = new $class($fullConfig,$this->builder,$this);
                 $f_config = $ext->configField($config);
-
                 if ( !is_array($f_config) ){
                     throw new ConfigException('Расширение '.$class.' должно возвращать массив');
                 }
-                $config = array_merge($f_config,$config  );
+                $config = array_merge($config,$f_config  );
+
             }
             $this->builder->setFieldConfig($name,$config);
         }
@@ -110,7 +133,7 @@ class Form{
      * @param $value
      * @return $this
      */
-    private function setConfig($key, $value){
+    public function setConfig($key, $value){
         $this->builder->setFormConfig($key,$value);
         return $this;
     }

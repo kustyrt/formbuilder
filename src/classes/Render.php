@@ -20,6 +20,7 @@ class Render{
 
     protected
         $config=[];
+
     private
         $builder = false;
 
@@ -36,7 +37,9 @@ class Render{
         $this->loadExtensions(  );
     }
 
-
+    function getConfig(){
+        return $this->config;
+    }
 
 
     function render(){
@@ -129,6 +132,7 @@ class Render{
         $result.="
 });
 </script>";
+        self::$staticJs = '';
         return $result;
     }
 
@@ -156,7 +160,7 @@ class Render{
 
     protected function formRender($content){
 
-        $form=$this->setLine('<form enctype="multipart/form-data" method="'.$this->config['method'].'" id="'.$this->nameForm.'">');
+        $form=$this->setLine('<form enctype="multipart/form-data" method="'.$this->config['method'].'" id="'.$this->builder->getNameForm().'">');
         $form.=$content;
         $form .= $this->setLine('</form>');
 

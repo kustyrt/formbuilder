@@ -26,6 +26,15 @@ class Fields
         return [];
     }
 
+    public function setConfig($key,$value)
+    {
+        if ( !isset($key) ){
+            throw new ConfigException('Нужно указать ключ');
+        }
+        $this->config[$key] =  $value ;
+        return $this;
+    }
+
     public function setLabel($label)
     {
         $this->config['label'] =  $label ;
@@ -76,9 +85,7 @@ class Fields
     public function renderElement($response){
         $attrs = '';
         foreach($this->config as $k=>$v ){
-            if ( !in_array($k,['title','id','type','name','style','value' ]) ){
-                continue;
-            }
+
             if ( !is_null($v) ){
                 $attrs.=$k.'="'.$v.'" ';
             }

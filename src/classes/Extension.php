@@ -5,7 +5,12 @@ namespace Nifus\FormBuilder;
 class Extension{
 
     protected
-        $render,$builder = false,
+      
+    $builder;
+
+    protected
+        $render,
+
         $config = [];
 
     public function __construct($config,$builder,$render){
