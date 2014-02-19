@@ -203,7 +203,7 @@ class FormBuilder
                     if (!is_array($config)) {
                         throw new ConfigException('Расширение ' . $class . ' должно возвращать массив');
                     }
-                    $config = array_merge($f_config,$config  );
+                    $config = array_merge($config,$f_config  );
                 }
             }
             $this->setFieldConfig($name,$config);
