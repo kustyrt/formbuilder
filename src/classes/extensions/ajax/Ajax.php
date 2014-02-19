@@ -15,7 +15,7 @@ class Ajax extends Extension
     {
 
         \Nifus\FormBuilder\Render::jsAdd('jquery');
-        //\Nifus\FormBuilder\Render::jsAdd('jquery.form','ajax');
+        \Nifus\FormBuilder\Render::jsAdd('jquery.form','ajax');
 
         // валидация
         \Nifus\FormBuilder\Render::jsAdd('jquery.validate.min', 'validate');

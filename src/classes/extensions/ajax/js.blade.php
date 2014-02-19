@@ -1,32 +1,41 @@
-<script>
-    $(document).ready(function() {
+<script type="text/javascript">
+    {{$formName}} = {
+        send:false,
+        ini:function(){
+            {{$formName}}.validate();
+            {{$formName}}.ajax();
+        },
+        validate:function(){
+            $("#{{$formName}}").validetta({
+                realTime     : true
 
-        $("#{{$formName}}").validetta();
-
-        /*
-        var options = {
-            'url': '{{$formAction}}',
-            'dataType': 'json',
-            'type': 'post',
-            'success': function (json) {
-                if (json && json.error) {
-                    $('#{{$formName}}Message').html(json.error);
-                    $('#{{$formName}} [name=' + json.field + ']').focus();
-                } else if (json && json.url) {
-                    window.location = json.url;
-                    //window.location.reload(true);
-                } else {
-                    window.location.reload(true);
+            });
+        },
+        ajax:function(){
+            var options = {
+                'url': '{{$formAction}}',
+                'dataType': 'json',
+                'type': 'post',
+                'success': function (json) {
+                    if (json && json.error) {
+                        $('#{{$formName}}Message').html(json.error);
+                        $('#{{$formName}} [name=' + json.field + ']').focus();
+                    } else if (json && json.url) {
+                        window.location = json.url;
+                        //window.location.reload(true);
+                    } else {
+                        window.location.reload(true);
+                    }
+                },
+                'error': function (event, jqXHR, ajaxSettings) {
+                    //alert('Попробуйте еще раз!');
+                    return false;
                 }
-            },
-            'error': function (event, jqXHR, ajaxSettings) {
-                //alert('Попробуйте еще раз!');
-                return false;
-            },
-            beforeSubmit: function(arr, $form, options) {
-               return false;
             }
+            $("#{{$formName}}").ajaxForm(options);
         }
-        $("#{{$formName}}").ajaxForm(options);*/
+    }
+    $(document).ready(function() {
+        {{$formName}}.ini();
     });
 </script>

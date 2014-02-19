@@ -53,6 +53,11 @@ class Render{
                 break;
             case('ul'):
                 break;
+            case('p'):
+                $this->formRender($this->paragrafRender()).
+                $this->cssRender().
+                $this->jsRender();
+                break;
             case('dev'):
                 break;
             case('array'):
@@ -195,6 +200,25 @@ class Render{
 
 
         return $table;
+    }
+
+
+
+    protected function paragrafRender(){
+        $par = '';
+        foreach( $this->config['fields'] as $name=>$config){
+            $elementRender = $this->elementRender($name,$config);
+            $par.=$this->setLine('<p class="'.$name.'">');
+            $par.=$this->setLine($elementRender['label'].'');
+            $par.=$this->setLine('</p>');
+            $par.=$this->setLine('<p>');
+            $par.=$this->setLine($elementRender['element']);
+            $par.=$this->setLine('</p>');
+        }
+        $par.=$this->setLine('<p><input type="submit" /></p>');
+
+
+        return $par;
     }
 
     /**
