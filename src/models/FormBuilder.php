@@ -330,6 +330,7 @@ class FormBuilder{
                 $related = $f->getRelated();
                 $key = $related->getForeignKey();   //  ключ связь для основной таблицы
                 $mainKey = $related->getKeyName();
+                $mainKey = isset($config['key']) ? $config['key'] : $mainKey;
                 $values[]=$mainKey;
                 $order = [];
                 if ( !isset($config['sort']) ){
