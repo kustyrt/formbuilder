@@ -353,7 +353,7 @@ class FormBuilder{
                 foreach( $order as $orderKey=>$type ){
                     $sql->orderBy($orderKey,$type);
                 }
-                $items = $sql->get($values);
+                $items = $sql->get();
 
 
                 foreach($items as $item ){
