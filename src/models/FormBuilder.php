@@ -277,7 +277,10 @@ class FormBuilder{
     function isMultiple($config){
         if ( !isset($config['method']) ){
             return false;
+        }
 
+        if ( isset($config['multiple']) && true===$config['multiple'] ){
+            return true;
         }
         $object = new $this->config['model'];
         $f = $object->$config['method']();
@@ -291,6 +294,9 @@ class FormBuilder{
         $select = isset($data) ? $data : ( isset($config['default']) ? $config['default'] : null)  ;
         if ( !is_array($select) ){
             $select=[$select];
+        }
+        if ( isset($config['selected_mutator']) ){
+            $select =$config['selected_mutator']($data);
         }
         $data='';
         $config['type'] = (isset($config['type'])) ? $config['type'] :
