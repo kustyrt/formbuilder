@@ -168,7 +168,7 @@ class FormBuilder{
 
         $attrs = '';
         foreach($config as $k=>$v ){
-            if ( !in_array($k,['title','id','type','name','style','value' ]) ){
+            if ( !in_array($k,['title','id','type','name','style','value','class' ]) ){
                 continue;
             }
             if ( !is_null($v) ){

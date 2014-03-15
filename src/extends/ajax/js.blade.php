@@ -6,12 +6,16 @@
             'type': 'post',
             'success': function (json) {
                 if (json && json.error) {
-                    $('#{{$formName}}Message').html(json.error);
-                    $('form.{{$formAction}} [name=' + json.field + ']').focus();
+                    $('#{{$formName}}Message').html(json.error).show();
+                    $('form.{{$formName}} [name=' + json.field + ']').focus();
                 } else if (json && json.url) {
                     window.location = json.url;
                     //window.location.reload(true);
-                } else {
+                } else if (json && json.msg) {
+                    $('#{{$formName}}Message').html(json.msg).show();
+                    $('#{{$formName}}').hide();
+
+                }else {
                     window.location.reload(true);
                 }
             },
