@@ -77,7 +77,7 @@ class FormBuilder{
 
         if ( isset($this->config['ajax'])  ){
             self::jsAdd('jquery.form');
-        }
+        }*/
         return true;
     }
 
@@ -181,7 +181,7 @@ class FormBuilder{
             if ( !class_exists($class) ){
                 continue;
             }
-            $fields = $class::fields($config);
+            $fields = $class::fields($config,$name,$this);
             if ( sizeof($fields)>0 ){
                 foreach($fields as $k=>$v ){
                     if ( !is_null($v) ){
@@ -251,11 +251,29 @@ class FormBuilder{
                 $data = $this->selectDataFormat($config['data'],$this->getData($name) );
                 $multi='';
                 if ( $this->isMultiple($config['data']) ){
-                    $multi = 'multiple="multiple" size="5"';
+                    $size= isset($config['data']['size']) ? $config['data']['size'] : 5;
+                    $multi = 'multiple="multiple" size="'.$size.'"';
                 }
                 return [
                     'label'=>'<label for="'.$config['id'].'"  name="'.$name.'">'.$config['label'].'</label>',
                     'element'=>'<select '.$multi.' name="'.$config['name'].'" id="'.$config['id'].'" '.$attrs.'>'.$data.'</select>'
+                ];
+                break;
+            case('radio'):
+                $select = $this->getData($name);
+                if ( is_null($select) && isset($config['data']['default']) ){
+                    $select=$config['data']['default'];
+                }
+                $elements = [];
+                $labels = [];
+                foreach( $config['data']['source'] as $key=>$value ){
+                    $selected = ($key==$select) ? 'checked="checked"' : '';
+                    $elements[$key]='<input type="radio" value="'.$key.'" '.$selected.'  id="'.$config['id'].'"  '.$attrs.' />';
+                    $labels[$key]='<label for="'.$config['id'].'" >'.$value.'</label>';
+                }
+                return [
+                    'label'=>$labels,
+                    'element'=>$elements,
                 ];
                 break;
             default:
@@ -275,12 +293,12 @@ class FormBuilder{
     }
 
     function isMultiple($config){
-        if ( !isset($config['method']) ){
-            return false;
-        }
 
         if ( isset($config['multiple']) && true===$config['multiple'] ){
             return true;
+        }
+        if ( !isset($config['method']) ){
+                   return false;
         }
         $object = new $this->config['model'];
         $f = $object->$config['method']();
@@ -306,12 +324,23 @@ class FormBuilder{
             foreach($config['source'] as $key=>$value ){
 
                 $selected = in_array($value,$select) ? 'selected="selected"' : '';
-                 $data.='<option '.$selected.' value="'.htmlspecialchars($value).'">'.htmlspecialchars($value).'</option>';
+                $data.='<option '.$selected.' value="'.htmlspecialchars($value).'">'.htmlspecialchars($value).'</option>';
             }
         }elseif( $config['type']=='keyvalue'){
             foreach($config['source'] as $key=>$value ){
-                $selected = in_array($key,$select) ? 'selected="selected"' : '';
-                $data.='<option '.$selected.' value="'.htmlspecialchars($key).'">'.htmlspecialchars($value).'</option>';
+                if ( is_array($value) ){
+                    $data.='<optgroup  label="'.htmlspecialchars($key).'">';
+                    foreach($value as $key2=>$value2 ){
+                        $selected = in_array($key2,$select) ? 'selected="selected"' : '';
+                        $data.='<option '.$selected.' value="'.htmlspecialchars($key2).'">'.htmlspecialchars($value2).'</option>';
+                    }
+                    $data.='</optgroup>';
+
+                }else{
+                    $selected = in_array($key,$select) ? 'selected="selected"' : '';
+                    $data.='<option '.$selected.' value="'.htmlspecialchars($key).'">'.htmlspecialchars($value).'</option>';
+                }
+
             }
         }elseif( $config['type']=='model'){
             $values = [];
@@ -538,7 +567,7 @@ class FormBuilder{
 
 
 
-    protected function getData($key){
+    public function getData($key){
         if ( $this->isSubmit() ){
             return $this->getResponseData($key);
         }else{
