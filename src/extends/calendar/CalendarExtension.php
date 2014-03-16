@@ -19,8 +19,9 @@ class CalendarExtension{
         if ( isset($config['date-format'])   ){
             $return['date-format']=$config['date-format'];
         }
-
-        $return['data-value']=$formBuilder->getData($name);
+        if ( isset($config['data-value']) ){
+            $return['data-value']=$formBuilder->getData($name);
+        }
         return $return;
 
     }
