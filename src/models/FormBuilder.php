@@ -77,7 +77,7 @@ class FormBuilder{
 
         if ( isset($this->config['ajax'])  ){
             self::jsAdd('jquery.form');
-        }*/
+        }
         return true;
     }
 
