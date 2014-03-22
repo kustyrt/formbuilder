@@ -82,14 +82,19 @@ class Fields
         return '<label for="'.$this->config['id'].'" >'.$this->config['label'].'</label>';
     }
 
-    public function renderElement($response){
+    protected function renderAttrs(){
         $attrs = '';
         foreach($this->config as $k=>$v ){
 
-            if ( !is_null($v) ){
+            if ( !is_null($v) && !in_array($k,['data']) ){
                 $attrs.=$k.'="'.$v.'" ';
             }
         }
+        return $attrs;
+    }
+
+    public function renderElement($response){
+        $attrs = $this->renderAttrs();
         $value = $response->getData($this->name);
         if ( !is_null($value) ){
             $attrs.='value="'.htmlspecialchars($value).'"';

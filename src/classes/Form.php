@@ -23,8 +23,9 @@ class Form{
     public function getConfig(){
         return $this->builder->getConfig();
     }
-    public function render(){
-        return $this->builder->render();
+    public function render($fields=array()){
+
+        return $this->builder->render($fields);
     }
 
     protected function getDefaultConfig(){
@@ -66,7 +67,7 @@ class Form{
         return $this;
     }
     public function setAction($action){
-        $this->setConfig('method',$action);
+        $this->setConfig('action',$action);
         return $this;
     }
     public function setEnctype($enctype){
@@ -108,18 +109,20 @@ class Form{
             }
                 //  расширение
             $fullConfig = $this->builder->getConfig();
-            foreach( $fullConfig['extensions'] as $ext ){
-                $class = 'Nifus\FormBuilder\Extensions\\'.$ext.'';
-                if ( !class_exists($class) ){
-                    throw new ConfigException('Не найден класс '.$class);
-                }
-                $ext = new $class($fullConfig,$this->builder,$this);
-                $f_config = $ext->configField($config);
-                if ( !is_array($f_config) ){
-                    throw new ConfigException('Расширение '.$class.' должно возвращать массив');
-                }
-                $config = array_merge($config,$f_config  );
+            if ( isset($fullConfig['extensions']) ){
+                foreach( $fullConfig['extensions'] as $ext ){
+                    $class = 'Nifus\FormBuilder\Extensions\\'.$ext.'';
+                    if ( !class_exists($class) ){
+                        throw new ConfigException('Не найден класс '.$class);
+                    }
+                    $ext = new $class($fullConfig,$this->builder,$this);
+                    $f_config = $ext->configField($config);
+                    if ( !is_array($f_config) ){
+                        throw new ConfigException('Расширение '.$class.' должно возвращать массив');
+                    }
+                    $config = array_merge($config,$f_config  );
 
+                }
             }
             $this->builder->setFieldConfig($name,$config);
         }

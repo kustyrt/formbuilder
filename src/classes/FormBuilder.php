@@ -60,13 +60,14 @@ class FormBuilder
     /**
      * Выдаём результат
      *
+     * @param array $fields список полей для рендинга
      * @return array|string
      * @throws ConfigException
      */
-    public function render()
+    public function render($fields=array())
     {
         $render = new Render($this->config, $this);
-        return $render->render();
+        return $render->render($fields);
     }
 
     public function errors()

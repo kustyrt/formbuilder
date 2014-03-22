@@ -13,7 +13,7 @@ class Render{
         $assetJs = [
             'jquery' => false,
             //'require'=>null,
-            'engine'=>null
+            //'engine'=>null
         ],
         $assetCss = [],
         $staticJs = '';
@@ -42,9 +42,22 @@ class Render{
     }
 
 
-    function render(){
+    function render($fields=array()){
 
         switch($this->config['render']['format']){
+            case('bootstrap3'):
+                if ( sizeof($fields)>0 ){
+                    return
+                        $this->bootstrap3Render($fields);
+                }else{
+                    return
+                        $this->formRender($this->bootstrap3Render()).
+                        $this->cssRender().
+                        $this->jsRender();
+                }
+
+                break;
+
             case('table'):
                 return
                     $this->formRender($this->tableRender()).
@@ -64,12 +77,7 @@ class Render{
                 $view = new RenderView($this->arrayRender(),$this->jsRender(),$this->cssRender());
 
                 return $view;
-                    /*[
-                    'fields' => $this->arrayRender(),
-                    'js'=>,
-                    'css'=>,
-                    //'errors'=>$this->errors(),
-                ];*/
+
                 break;
             default:
                 throw new ConfigException(' Неправильный формат вывода '.$this->config['render']['format'] );
@@ -164,12 +172,17 @@ class Render{
 
 
     protected function formRender($content){
+        $formAttrs = [
+            'enctype'=>$this->config['enctype'],
+            'method'=>$this->config['method'],
+            'id'=>$this->builder->getNameForm(),
 
-        $form=$this->setLine('<form enctype="multipart/form-data" method="'.$this->config['method'].'" id="'.$this->builder->getNameForm().'">');
-        $form.=$content;
-        $form .= $this->setLine('</form>');
+        ];
+        if ( isset($this->config['action']) ){
+            $formAttrs['url']=$this->config['action'];
+        }
 
-        return $form;
+        return \Form::open($formAttrs).$content.\Form::close();;
     }
 
     protected function arrayRender(){
@@ -199,6 +212,31 @@ class Render{
         $table .= $this->setLine('</table>');
 
 
+        return $table;
+    }
+
+    protected function bootstrap3Render($fields = array() ){
+        $table = $this->setLine('<div class="col-md-6">');
+
+        if ( sizeof($fields)>0 ){
+            foreach( $this->config['fields'] as $name=>$config){
+                if ( !in_array($name,$fields) ){
+                    continue;
+                }
+                $elementRender = $this->elementRender($name,$config);
+                $table.=$this->setLine($elementRender['label']);
+                $table.=$this->setLine($elementRender['element']);
+            }
+        }else{
+            foreach( $this->config['fields'] as $name=>$config){
+                $elementRender = $this->elementRender($name,$config);
+                $table.=$this->setLine($elementRender['label']);
+                $table.=$this->setLine($elementRender['element']);
+            }
+
+        }
+
+        $table .= $this->setLine('</div>');
         return $table;
     }
 
@@ -317,129 +355,6 @@ class Render{
         return [];*/
     }
 
-    function isMultiple($config){
-        if ( !isset($config['method']) ){
-            return false;
-
-        }
-        $object = new $this->config['model'];
-        $f = $object->$config['method']();
-        if (  $f instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany  ){
-
-            return true;
-        }
-        return false;
-    }
-    function selectDataFormat($config,$data=null){
-        $select = isset($data) ? $data : ( isset($config['default']) ? $config['default'] : null)  ;
-        if ( !is_array($select) ){
-            $select=[$select];
-        }
-        $data='';
-        $config['type'] = (isset($config['type'])) ? $config['type'] :
-            (isset($config['method']) ? 'model' : null );
-
-        if ( $config['type']=='value' ){
-            foreach($config['source'] as $key=>$value ){
-
-                $selected = in_array($value,$select) ? 'selected="selected"' : '';
-                $data.='<option '.$selected.' value="'.htmlspecialchars($value).'">'.htmlspecialchars($value).'</option>';
-            }
-        }elseif( $config['type']=='keyvalue'){
-            foreach($config['source'] as $key=>$value ){
-                $selected = in_array($key,$select) ? 'selected="selected"' : '';
-                $data.='<option '.$selected.' value="'.htmlspecialchars($key).'">'.htmlspecialchars($value).'</option>';
-            }
-        }elseif( $config['type']=='model'){
-            $values = [];
-            if ( isset($config['value']) ){
-                preg_match_all('#\{([^}]*)\}#iUs',$config['value'],$find);
-                if (sizeof($find[1])>0){
-                    $values=$find[1];
-                }else{
-                    $values=[$config['value']];
-                    $config['value']='{'.$config['value'].'}';
-                }
-            }else{
-                $values = ['title'];
-            }
-
-            $object = new $this->config['model'];
-            $f = $object->$config['method']();
-            if (  $f instanceof \Illuminate\Database\Eloquent\Relations\BelongsTo  ){
-                //  связь один ко многим
-
-                //  получаем модель связанную
-                $related = $f->getRelated();
-                $key = $related->getForeignKey();   //  ключ связь для основной таблицы
-                $mainKey = $related->getKeyName();
-                $values[]=$mainKey;
-                $order = [];
-                if ( !isset($config['sort']) ){
-                    $order[$key]='ASC';
-                }elseif( is_string($config['sort']) ){
-                    $order[$config['sort']]='ASC';
-                }elseif( is_array($config['sort']) ){
-                    die('сортировка по множественным параметрам не реализована');
-                }
-
-
-
-                $sql = $related;
-                foreach( $order as $orderKey=>$type ){
-                    $sql->orderBy($orderKey,$type);
-                }
-                $items = $sql->get($values);
-
-
-                foreach($items as $item ){
-
-                    $selected = in_array($item->$mainKey,$select) ? 'selected="selected"' : '';
-                    $value = $config['value'];
-                    foreach($values as $sqlValue ){
-                        $value = str_replace('{'.$sqlValue.'}',$item->$sqlValue,$value);
-                    }
-                    $data.='<option '.$selected.' value="'.htmlspecialchars($item->$mainKey).'">'.htmlspecialchars($value).'</option>';
-                }
-
-                //$related->
-            }elseif (  $f instanceof \Illuminate\Database\Eloquent\Relations\belongsToMany  ){
-                //  связь многие ко многим
-
-                //  получаем модель связанную
-
-                $related = $f->getRelated();
-                $table = $f->getTable();
-                $key = $related->getForeignKey();
-                $values[]=$key;
-                $order = [];
-                if ( !isset($config['sort']) ){
-                    $order[$key]='ASC';
-                }elseif( is_string($config['sort']) ){
-                    $order[$config['sort']]='ASC';
-                }elseif( is_array($config['sort']) ){
-                    die('сортировка по множественным параметрам не реализована');
-                }
-                $sql = $related;
-                foreach( $order as $orderKey=>$type ){
-                    $sql->orderBy($orderKey,$type);
-                }
-                $items = $sql->get($values);
-
-                foreach($items as $item ){
-                    $selected = in_array($item->$key,$select) ? 'selected="selected"' : '';
-                    $value = $config['value'];
-                    foreach($values as $sqlValue ){
-                        $value = str_replace('{'.$sqlValue.'}',$item->$sqlValue,$value);
-                    }
-                    $data.='<option '.$selected.' value="'.htmlspecialchars($item->$key).'">'.htmlspecialchars($value).'</option>';
-                }
-
-                //$related->
-            }
-        }
-        return $data;
-    }
 
 
 
