@@ -60,6 +60,12 @@ class Fields
         return $this;
     }
 
+    public function setClass($class)
+    {
+        $this->config['class'] = $class;
+        return $this;
+    }
+
     public function getName(){
         return $this->name;
     }
