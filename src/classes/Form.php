@@ -66,6 +66,11 @@ class Form{
         $this->setConfig('method',$method);
         return $this;
     }
+
+    public  function setModel($model){
+        $this->setConfig('model',$model);
+        return $this;
+    }
     public function setAction($action){
         $this->setConfig('action',$action);
         return $this;
@@ -102,6 +107,7 @@ class Form{
     public function setFields(array $fields){
         $fieldsConfig=[];
         foreach( $fields as $field ){
+
             $config = $field->getConfig();
             list($name,$config)= each($config);
             if ( isset($fieldsConfig[$name]) ){

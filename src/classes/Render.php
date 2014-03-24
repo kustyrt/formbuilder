@@ -153,6 +153,8 @@ class Render
             throw new RenderException('Не найден класс ' . $class);
         }
         $element = new $class($name, $config);
+        $element->setBuilder($this->builder);
+
         return ['label' => $element->renderLabel(), 'element' => $element->renderElement($response)];
 
     }
@@ -276,10 +278,10 @@ class Render
                 $table .= $this->setLine('<div>');
 
                 foreach( $elementRender['element'] as $i=>$element ){
-                    $table .= $this->setLine('<div class="radio"><label class="checkbox-inline">
+                    $table .= $this->setLine('<label class="checkbox-inline">
 ');
                     $table .= $this->setLine($elementRender['element'][$i]);
-                    $table .= $this->setLine('</label></div>');
+                    $table .= $this->setLine('</label>');
 
                 }
                 $table .= $this->setLine('</div>');

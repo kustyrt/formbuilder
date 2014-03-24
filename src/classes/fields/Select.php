@@ -4,9 +4,16 @@ namespace Nifus\FormBuilder\Fields;
 
 class Select extends \Nifus\FormBuilder\Fields{
 
+
+    public function setOrder($rules)
+    {
+        $this->config['data']['order_rules'] = $rules;
+        return $this;
+    }
     public function setMethod($method)
     {
         $this->config['data']['method'] = $method;
+        $this->config['data']['type'] = 'model';
         return $this;
     }
     public function setDefault($default)
@@ -27,8 +34,15 @@ class Select extends \Nifus\FormBuilder\Fields{
         return $this;
     }
 
+    public function setValue($value)
+    {
+        $this->config['data']['value'] = $value;
+        return $this;
+    }
+
 
     public function renderElement($response){
+
         $attrs = $this->renderAttrs();
         $data = $this->selectDataFormat( $response->getData($this->name) );
         $multi='';
@@ -42,7 +56,7 @@ class Select extends \Nifus\FormBuilder\Fields{
     protected function getDefaultConfig()
     {
         return [
-            'data'=>['type'=>'key_value']
+            'data'=>['type'=>'key_value','value'=>'{{title}}']
         ];
     }
 
@@ -51,7 +65,8 @@ class Select extends \Nifus\FormBuilder\Fields{
         if ( !isset($config['method']) ){
             return false;
         }
-        $object = new $this->config['model'];
+        $model = $this->builder->getConfig('model');
+        $object = new $model;
         $f = $object->$config['method']();
         if (  $f instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany  ){
             return true;
@@ -121,20 +136,9 @@ class Select extends \Nifus\FormBuilder\Fields{
 
     private function generateOptionsModel(array $config,array $select){
         $html = '';
-        $values = [];
-        if ( isset($config['value']) ){
-            preg_match_all('#\{([^}]*)\}#iUs',$config['value'],$find);
-            if (sizeof($find[1])>0){
-                $values=$find[1];
-            }else{
-                $values=[$config['value']];
-                $config['value']='{'.$config['value'].'}';
-            }
-        }else{
-            $values = ['title'];
-        }
 
-        $object = new $this->config['model'];
+        $model = $this->builder->getConfig('model');
+        $object = new $model;
         $f = $object->$config['method']();
 
 
@@ -151,6 +155,19 @@ class Select extends \Nifus\FormBuilder\Fields{
 
 
     private function generateOptionsModelBelongsTo($object,$select){
+        $config = $this->config['data'];
+        $values = [];
+        if ( isset($config['value']) ){
+            preg_match_all('#\{([^}]*)\}#iUs',$config['value'],$find);
+            if (sizeof($find[1])>0){
+                $values=$find[1];
+            }else{
+                $values=[$config['value']];
+                $config['value']='{'.$config['value'].'}';
+            }
+        }else{
+            $values = ['title'];
+        }
         $html = '';
         //  получаем модель связанную
         $related = $object->getRelated();
@@ -158,24 +175,20 @@ class Select extends \Nifus\FormBuilder\Fields{
         $mainKey = $related->getKeyName();
         $values[]=$mainKey;
         $order = [];
-        if ( !isset($config['sort']) ){
-            $order[$key]='ASC';
-        }elseif( is_string($config['sort']) ){
-            $order[$config['sort']]='ASC';
-        }elseif( is_array($config['sort']) ){
-            die('сортировка по множественным параметрам не реализована');
-        }
-
         $sql = $related;
-        foreach( $order as $orderKey=>$type ){
-            $sql->orderBy($orderKey,$type);
+        if ( isset($config['order_rules']) ){
+            foreach( $config['order_rules'] as $orderKey=>$type ){
+                $sql = $sql->orderBy($orderKey,$type);
+            }
         }
         $items = $sql->get($values);
 
         foreach($items as $item ){
             $selected = in_array($item->$mainKey,$select) ? 'selected="selected"' : '';
-            $value = $config['value'];
+            $value = $this->config['data']['value'];
+
             foreach($values as $sqlValue ){
+
                 $value = str_replace('{'.$sqlValue.'}',$item->$sqlValue,$value);
             }
             $html.='<option '.$selected.' value="'.htmlspecialchars($item->$mainKey).'">'.htmlspecialchars($value).'</option>';
@@ -191,17 +204,14 @@ class Select extends \Nifus\FormBuilder\Fields{
         $key = $related->getForeignKey();
         $values[]=$key;
         $order = [];
-        if ( !isset($config['sort']) ){
-            $order[$key]='ASC';
-        }elseif( is_string($config['sort']) ){
-            $order[$config['sort']]='ASC';
-        }elseif( is_array($config['sort']) ){
-            die('сортировка по множественным параметрам не реализована');
-        }
+
         $sql = $related;
-        foreach( $order as $orderKey=>$type ){
-            $sql->orderBy($orderKey,$type);
+        if ( isset($config['order_rules']) ){
+            foreach( $config['order_rules'] as $orderKey=>$type ){
+                $sql->orderBy($orderKey,$type);
+            }
         }
+
         $items = $sql->get($values);
 
         foreach($items as $item ){

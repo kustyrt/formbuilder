@@ -4,7 +4,9 @@ namespace Nifus\FormBuilder;
 
 class Fields
 {
+    public $builder;
     protected
+
         $config = [],
         $name;
 
@@ -17,7 +19,9 @@ class Fields
     }
 
 
-
+    public function setBuilder($builder){
+        $this->builder = $builder;
+    }
     protected function getDefaultConfig()
     {
         if ( !isset($this->config['type']) ){
