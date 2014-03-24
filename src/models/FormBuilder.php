@@ -13,7 +13,7 @@ class FormBuilder{
     $assetCss = [
 
     ];
-    static $staticJs = '';
+    public $staticJs = '';
     public
         $config,$errors = [];
     protected
@@ -75,9 +75,7 @@ class FormBuilder{
             $class::autoload($this);
         }
 
-        /*if ( isset($this->config['ajax'])  ){
-            self::jsAdd('jquery.form');
-        }*/
+
         return true;
     }
 
@@ -190,8 +188,8 @@ class FormBuilder{
                 }
             }
 
-        }
 
+        }
 
 
 
@@ -274,6 +272,14 @@ class FormBuilder{
                 return [
                     'label'=>$labels,
                     'element'=>$elements,
+                ];
+                break;
+            case('checkbox'):
+                $value = $this->getData($name);
+                $value = !empty($value ) ? 'checked="checked"' : '';
+                return [
+                    'label'=>'<label for="'.$config['id'].'"  name="'.$name.'">'.$config['label'].'</label>',
+                    'element'=>'<input type="checkbox" '.$value.' value="1" name="'.$config['name'].'" id="'.$config['id'].'" '.$attrs.' />'
                 ];
                 break;
             default:
@@ -468,7 +474,6 @@ class FormBuilder{
             }
 
 
-
         $model->save();
         $id = $model-> getKey();
 
@@ -557,7 +562,6 @@ class FormBuilder{
             $rel = $this->model->$configKey['data']['method']();
             if (  $rel instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany  ){
                 return $rel-> getRelatedIds() ;
-
             }
         }
         return $this->model->$key;
@@ -614,7 +618,7 @@ class FormBuilder{
                 self::$assetJs[$file]=false;
             }
         }
-        $result.=self::$staticJs."
+        $result.=$this->staticJs."
 <script>$(document).ready(function() {
    $('#".$this->nameForm."').append($('<input type=\"hidden\" name=\"".$this->nameForm."_formbuildersubmit\" value=\"1\">'));
    ";
@@ -640,11 +644,11 @@ class FormBuilder{
         }
         self::$assetCss[$file]=$ext;
     }
-    static function setJs($js,$path=null){
+    public function setJs($js,$path=null){
         if ( is_null($path) ){
-            self::$staticJs.="\n\r".$js."\n\r";
+            $this->staticJs.="\n\r".$js."\n\r";
         }else{
-            self::$staticJs.="\n\r"."<!-- include " . $path . "--> \n\r" . $js ."\n\r";
+            $this->staticJs.="\n\r"."<!-- include " . $path . "--> \n\r" . $js ."\n\r";
         }
     }
 
