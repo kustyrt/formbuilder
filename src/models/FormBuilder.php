@@ -196,8 +196,16 @@ class FormBuilder{
 
 
         switch($config['type']){
-
-
+            case('number'):
+                $value = $this->getData($name);
+                if ( !is_null($value) ){
+                    $attrs.='value="'.htmlspecialchars($value).'"';
+                }
+                return [
+                    'label'=>'<label for="'.$config['id'].'" >'.$config['label'].'</label>',
+                    'element'=>'<input type="number"  id="'.$config['id'].'"  '.$attrs.' />',
+                ];
+                break;
             case('file'):
                 $value = $this->getData($name);
                 if ( !is_null($value) ){
