@@ -1,66 +1,66 @@
 formbuilder
 ===========
 
- Laravel 4 пакет для генерации форм
+ Laravel 4 package for generate HTML form
  
-Использование 
+Install 
+===========
+
+Formbuilder installs just like any other package, via Composer : `composer require nifus/formbuilder 0.1.x`. 
+
+
+Then if you're using Laravel, add Flatten's Service Provider to you `config/app.php` file :
+```php
+ 	'providers' => array(
+        // ...
+        'Nifus\Formbuilder\FormbuilderServiceProvider',
+    ),
+```
+
+And:
+
+```php
+ 	'aliases' => array(
+        // ...
+        'Formbuilder' => 'Nifus\Formbuilder\Facade',
+    ),
+```
+
+Using 
 ===========
 
 
-Создаё форму, указывая её ID ResetPasswordForm:
+Create form with ID `login`:
 
 ```php
-	$f = new \Nifus\FormBuilder\FormBuilder('ResetPasswordForm');
+	$form = new Formbuilder('login');
 ```
 
-Передаём массив данных для генерации 
+Set config form
 ```php
-        $f->setConfig( [
-            'method' => 'post',
-            'action' => null,
-            'engine' => null,
-            'ajax' => ['url' => route('user.reset_password')],
-            'fields'=>[
-                'email'=>['title'=>'E-mail', 'required'=>'min:3;'],
-            ],
-            'render'=>['format' => 'array'],
-            'Extensions' => ['Ajax']
-        ] );
+	$form->setAction('/login')
+		->setMethod('post')
+		..
 ```
 
-Получаем результат работы
+Set Fields
 ```php
-$f->render() 
+	$form->setFields(
+		[
+			Formbuilder::createField('text')->setName('login')->setLabel('Login'),
+			Formbuilder::createField('password')->setName('pass')->setLabel('Password'),
+		]
+	)
+	..
 ```
- 
-Параметры 
+
+Show result
+```php
+	$form->render();
+```
+
+Extend Fields 
 ===========
 
-В массиве данных можно указывать следующие параметры:
-```
-	method - null | post | get  
-		По умолчанию post
-
-	enctype  - null | application/x-www-form-urlencoded | multipart/form-data | text/plain
-		По умолчанию multipart/form-data
-
-	action -  null | URL 
-		адрес обработчка формы. 
-		Если null то форма будет отправлена по текущему адресу
-
-	render 	- null | Array[
-				format - array|table|ul
-			]  
-		Формат вывода формы. 
-		По умолчанию array.
-
-
-	extensions  - null | Array 
-		список расширений подключаемых для генерации формы
-
-	fields - Array
-		Список полей формы
-
-	Также есть целый ряд ключей которые используются расширениями для модификации формы
-```
-
+Extendtions  
+===========

@@ -30,6 +30,14 @@ class Fields
         return [];
     }
 
+
+    public function set($configs)
+    {
+        foreach( $configs as $key=>$value){
+            $this->setConfig($key,$value);
+        }
+        return $this;
+    }
     public function setConfig($key,$value)
     {
         if ( !isset($key) ){

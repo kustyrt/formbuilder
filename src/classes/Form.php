@@ -24,8 +24,14 @@ class Form{
         return $this->builder->getConfig();
     }
     public function render($fields=array()){
-
         return $this->builder->render($fields);
+    }
+    public function getRender(){
+        return $this->builder->getRender();
+    }
+
+    public function isSubmit( ){
+        return $this->builder->isSubmit();
     }
 
     protected function getDefaultConfig(){
