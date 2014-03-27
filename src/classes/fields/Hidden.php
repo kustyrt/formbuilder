@@ -12,9 +12,7 @@ class Hidden extends \Nifus\FormBuilder\Fields{
 
         $attrs = $this->renderAttrs();
         //$data = $response->getData($this->name);
-
         $elements='<input type="hidden"  '.$attrs.' />';
-
         return $elements;
     }
 }
