@@ -53,6 +53,12 @@ class Fields
         return $this;
     }
 
+    public function setValue($value)
+    {
+        $this->config['value'] =  $value ;
+        return $this;
+    }
+
     public function setId($id)
     {
         $this->config['id'] =  $id ;
@@ -104,7 +110,7 @@ class Fields
         $attrs = '';
         foreach($this->config as $k=>$v ){
 
-            if ( !is_null($v) && !in_array($k,['data']) ){
+            if ( !is_null($v) && !in_array($k,['data','inline']) ){
                 $attrs.=$k.'="'.$v.'" ';
             }
         }

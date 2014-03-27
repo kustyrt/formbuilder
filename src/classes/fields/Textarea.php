@@ -2,7 +2,7 @@
 namespace Nifus\FormBuilder\Fields;
 
 /**
- * Generate CheckBox
+ * Generate Textarea
  *
  * Class Radio
  * @package Nifus\FormBuilder\Fields

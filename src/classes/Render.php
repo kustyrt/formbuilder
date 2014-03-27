@@ -258,14 +258,19 @@ class Render
                 continue;
             }
             $elementRender = $this->elementRender($name, $config);
-            if ( true===$show_label ){
+            if ( true===$show_label && (!isset($config['inline']) || false===$config['inline'])){
                 $par .= $this->setLine('<p class="' . $name . '">');
                 $par .= $this->setLine($elementRender['label'] . '');
                 $par .= $this->setLine('</p>');
             }
-            $par .= $this->setLine('<p>');
-            $par .= $this->setLine($elementRender['element']);
-            $par .= $this->setLine('</p>');
+            if ( !isset($config['inline']) || false===$config['inline'] ){
+                $par .= $this->setLine('<p>');
+                $par .= $this->setLine($elementRender['element']);
+                $par .= $this->setLine('</p>');
+            }else{
+                $par .= $this->setLine($elementRender['element']);
+
+            }
         }
         if ( sizeof($fields)==0 ){
             $par .= $this->setLine('<p><input type="submit" /></p>');
