@@ -17,6 +17,7 @@ class FormBuilder{
     public
         $config,$errors = [];
     protected
+        $data=null,
         $model = false,
         $modelKey = false,
         $nameForm = false;
@@ -33,6 +34,10 @@ class FormBuilder{
 
     public function setId($id){
         $this->modelKey = $id;
+    }
+
+    public function setData(array $array){
+        $this->data = $array;
     }
 
 
@@ -541,7 +546,9 @@ class FormBuilder{
 
 
     protected function getResponseData($key){
-
+        if ( is_array($this->data) ){
+            return (isset($this->data[$key])) ? $this->data[$key] : null;
+        }
         switch($this->config['method']){
             case('post'):
                 return (isset($_POST[$key])) ? $_POST[$key] : null;
@@ -580,10 +587,11 @@ class FormBuilder{
 
 
     public function getData($key){
-        if ( $this->isSubmit() ){
+        $res = $this->getModelData($key);
+        if ( is_null($res) ){
             return $this->getResponseData($key);
         }else{
-            return $this->getModelData($key);
+            return $res;
         }
 
     }
