@@ -69,6 +69,10 @@ class FormBuilder
         $render = new Render($this->config, $this);
         return $render->render($fields);
     }
+    public function getRender()
+    {
+        return new Render($this->config, $this);
+    }
 
     public function errors()
     {
@@ -85,6 +89,10 @@ class FormBuilder
     {
         $response = new Response($this->config);
         return $response->save();
+    }
+
+    public function isSubmit( ){
+        return $this->response->isSubmit();
     }
 
     /**
@@ -212,4 +220,6 @@ class FormBuilder
         }
 
     }
+
+
 }

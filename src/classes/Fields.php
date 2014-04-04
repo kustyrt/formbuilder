@@ -30,6 +30,14 @@ class Fields
         return [];
     }
 
+
+    public function set($configs)
+    {
+        foreach( $configs as $key=>$value){
+            $this->setConfig($key,$value);
+        }
+        return $this;
+    }
     public function setConfig($key,$value)
     {
         if ( !isset($key) ){
@@ -42,6 +50,12 @@ class Fields
     public function setLabel($label)
     {
         $this->config['label'] =  $label ;
+        return $this;
+    }
+
+    public function setValue($value)
+    {
+        $this->config['value'] =  $value ;
         return $this;
     }
 
@@ -96,7 +110,7 @@ class Fields
         $attrs = '';
         foreach($this->config as $k=>$v ){
 
-            if ( !is_null($v) && !in_array($k,['data']) ){
+            if ( !is_null($v) && !in_array($k,['data','inline']) ){
                 $attrs.=$k.'="'.$v.'" ';
             }
         }

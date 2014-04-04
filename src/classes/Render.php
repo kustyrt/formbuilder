@@ -112,9 +112,16 @@ class Render
             case('ul'):
                 break;
             case('p'):
-                $this->formRender($this->paragrafRender()) .
-                $this->cssRender() .
-                $this->jsRender();
+                if (sizeof($fields) > 0) {
+                    return
+                        $this->paragrafRender($fields);
+                } else {
+                    return
+                        $this->formRender($this->paragrafRender()) .
+                        $this->cssRender() .
+                        $this->jsRender();
+                }
+
                 break;
             case('dev'):
                 break;
@@ -244,20 +251,30 @@ class Render
 
     protected function paragrafRender($fields = array())
     {
+        $show_label = isset($this->config['render']['label']) ? $this->config['render']['label'] : true;
         $par = '';
         foreach ($this->config['fields'] as $name => $config) {
             if (!in_array($name, $fields)) {
                 continue;
             }
             $elementRender = $this->elementRender($name, $config);
-            $par .= $this->setLine('<p class="' . $name . '">');
-            $par .= $this->setLine($elementRender['label'] . '');
-            $par .= $this->setLine('</p>');
-            $par .= $this->setLine('<p>');
-            $par .= $this->setLine($elementRender['element']);
-            $par .= $this->setLine('</p>');
+            if ( true===$show_label && (!isset($config['inline']) || false===$config['inline'])){
+                $par .= $this->setLine('<p class="' . $name . '">');
+                $par .= $this->setLine($elementRender['label'] . '');
+                $par .= $this->setLine('</p>');
+            }
+            if ( !isset($config['inline']) || false===$config['inline'] ){
+                $par .= $this->setLine('<p>');
+                $par .= $this->setLine($elementRender['element']);
+                $par .= $this->setLine('</p>');
+            }else{
+                $par .= $this->setLine($elementRender['element']);
+
+            }
         }
-        $par .= $this->setLine('<p><input type="submit" /></p>');
+        if ( sizeof($fields)==0 ){
+            $par .= $this->setLine('<p><input type="submit" /></p>');
+        }
         return $par;
     }
 
