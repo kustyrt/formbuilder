@@ -26,7 +26,7 @@ class Ajax extends Extension
         \Nifus\FormBuilder\Render::cssAdd('validetta', 'validate');
 
 
-        $config = $this->builder->getConfig('ajax');
+        $config = $this->builder->ajax;
         if (!isset($config) || !is_array($config)) {
             return false;
         }
@@ -36,7 +36,7 @@ class Ajax extends Extension
             ->with('formName', $this->builder->getNameForm())
             ->with('formName', $this->builder->getNameForm())
             ->with('formAction', $config['url']);
-        $this->render->setJs($v->render(), $v->getPath());
+        \Nifus\FormBuilder\Render::setJs($v->render(), $v->getPath());
 
 
     }

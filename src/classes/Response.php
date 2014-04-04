@@ -12,21 +12,21 @@ class Response{
     /**
      *
      */
-    function save(){
-
-        $id = $this->getResponseData( $this->builder->nameForm.'_formbuilderid' );
+    function save($fields){
+        $data_config = $this->builder->data;
+        $id = $this->getResponseData( $this->builder->form_name.'_formbuilderid' );
 
         if ( !is_null($id) ){
-            $model = $this->config['model'];
+            $model = $this->builder->model;
             $model = $model::find($id);
 
         }else{
-            $model = new $this->config['model'];
+            $model = new $this->builder->model;
         }
-        foreach( $this->config['fields'] as $name=>$config ){
-            if ( isset($config['data']['method']) ){
+        foreach( $fields as $name=>$config ){
+            if ( isset($data_config['method']) ){
                 $object = new $this->config['model'];
-                $f = $object->$config['data']['method']();
+                $f = $object->$data_config['method']();
                 //  пропускаем
                 if (  $f instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany  ){
                     continue;
@@ -40,9 +40,9 @@ class Response{
         $model->save();
         $id = $model-> getKey();
 
-        foreach( $this->config['fields'] as $name=>$config ){
-            if ( isset($config['data']['method']) ){
-                $f = $model->$config['data']['method']();
+        foreach( $fields as $name=>$config ){
+            if ( isset($data_config['method']) ){
+                $f = $model->$data_config['method']();
 
 
                 //  пропускаем
@@ -97,7 +97,7 @@ class Response{
 
 
     protected function getResponseData($key){
-        $config= $this->builder->getConfig('method');
+        $config= $this->builder->method;
         switch($config){
             case('post'):
                 return (isset($_POST[$key])) ? $_POST[$key] : null;
@@ -109,7 +109,7 @@ class Response{
     }
 
     protected function getModelData($key){
-        $model= $this->builder->getConfig('model');
+        $model= $this->builder->model;
         if ( is_null($model) ){
             return null;
         }
@@ -149,7 +149,7 @@ class Response{
      * Проверяем отправку формы
      */
     public function isSubmit(){
-        return !is_null($this->getResponseData( $this->builder->getNameForm().'_formbuildersubmit') ) ? true : false;
+        return !is_null($this->getResponseData( $this->builder->form_name.'_formbuildersubmit') ) ? true : false;
     }
 
 

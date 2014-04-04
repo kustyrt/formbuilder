@@ -1,41 +1,37 @@
 <?php
-
 namespace Nifus\FormBuilder;
 
 class FormBuilder
 {
-
-
     protected
-        $config = [], $errors = [],
+        $fields=[],
+        $config = [
+            'method' => 'post',
+            'enctype'=>'multipart/form-data'
+        ],
+        $errors = [],
         $model = false,
         $modelKey = false,
-        $nameForm = false,
         $response = false;
 
+
     /**
+     * Create new form
      *
-     * @param $nameForm
-     */
-    public function __construct($nameForm)
-    {
-        $this->nameForm = $nameForm;
-        $this->response = new Response($this);
-    }
-
-    /**
-     * @param $nameForm
+     * @param string $idForm
      * @param array $config
-     * @return Form
+     * @return FormBuilder
      */
-    static function create($nameForm, $config = array())
+    static function create($idForm, $config = array())
     {
-        $builder = new self($nameForm);
-        $builder->setConfig($config);
-        return new Form($builder);
+        $config = is_array($config) ? $config : [];
+        $builder = new self($idForm,$config);
+        return $builder;
     }
 
     /**
+     * Create new field
+     *
      * @param $type
      * @param array $config
      * @param string $name
@@ -52,26 +48,133 @@ class FormBuilder
         return $class->setType($type);
     }
 
+
+
+    /**
+     * @param  $format
+     * @param array $config
+     * @return $this
+     */
+    public function setRender($format,$config=[]){
+        $config = array_merge($config,['format'=>$format]);
+        return  $this->set('render',$config);
+    }
+
+    /**
+     * @param bool $flag
+     * @return $this
+     */
+    public function setJquery($flag){
+        if ( true===$flag){
+            Render::$assetJs['jquery']=null;
+        }else{
+            Render::$assetJs['jquery']=false;
+        }
+        return $this;
+    }
+
+    /**
+     * @param $method
+     * @return $this
+     */
+    public  function setMethod($method){
+        if ( empty($method) ){
+            $method = 'post';
+        }
+        return $this->set('method',$method);
+    }
+
+    /**
+     * @param $action
+     * @return mixed
+     */
+    public function setAction($action){
+        return $this->set('action',$action);
+    }
+
+
+    public function setEnctype($enctype){
+        if ( empty($enctype) ){
+            $enctype = 'multipart/form-data';
+        }
+        return $this->set('enctype',$enctype);
+    }
+
+
+
+    /**
+     * Подключаем расширения
+     *
+     * @param array $extensions
+     * @return $this
+     */
+    public function setExtensions(array $extensions){
+        return $this->set('extensions',$extensions);
+    }
+
+    /**
+     *
+     * @param array $fields
+     * @return $this
+     * @throws ConfigException
+     */
+    public function setFields(array $fields){
+        $fields_config=[];
+
+        foreach( $fields as $field ){
+            $config = $field->getConfig();
+            $name = $field->getName();
+            if ( isset($fields_config[$name]) ){
+                throw new ConfigException(' name:' . $name.' уже было определено ранее');
+            }
+            //  расширение
+            $exts = $this->extensions;
+            if ( !is_null($exts) ){
+                foreach( $exts as $ext )
+                {
+                    $class = 'Nifus\FormBuilder\Extensions\\'.$ext.'';
+                    if ( !class_exists($class) ){
+                        throw new ConfigException('Не найден класс '.$class);
+                    }
+                    $ext = new $class($this);
+                    $f_config = $ext->configField($config);
+                    if ( !is_array($f_config) ){
+                        throw new ConfigException('Расширение '.$class.' должно возвращать массив');
+                    }
+                    $config = array_merge($config,$f_config  );
+
+                }
+            }
+            $this->fields[$name]=$config;
+        }
+        return $this;
+    }
+
+
+    /**
+     * @param $model
+     * @return $this
+     */
+    public  function setModel($model){
+        return $this->set('model',$model);
+    }
+
+    /**
+     * Устанавливаем ключ для загрузки модели
+     * @param $id
+     */
     public function setId($id)
     {
         $this->modelKey = $id;
     }
 
     /**
-     * Выдаём результат
-     *
-     * @param array $fields список полей для рендинга
-     * @return array|string
-     * @throws ConfigException
+     *  обработка формы
      */
-    public function render($fields=array())
+    function save()
     {
-        $render = new Render($this->config, $this);
-        return $render->render($fields);
-    }
-    public function getRender()
-    {
-        return new Render($this->config, $this);
+        $response = new Response($this->config);
+        return $response->save($this->fields);
     }
 
     public function errors()
@@ -83,143 +186,61 @@ class FormBuilder
     }
 
     /**
-     *  обработка формы
+     * Проверяем, была ли отправлена форма
+     * @return bool
      */
-    function save()
-    {
-        $response = new Response($this->config);
-        return $response->save();
-    }
-
     public function isSubmit( ){
         return $this->response->isSubmit();
     }
 
-    /**
-     * Меняем конфиг формы
-     * @param $key
-     * @param $value
-     */
-    public function setFormConfig($key, $value)
-    {
-        $this->config[$key] = $value;
-    }
 
     /**
-     * Меняем конфиг поля формы
-     * @param $field
-     * @param $config
-     */
-    function setFieldConfig($field, $config)
-    {
-        $this->config['fields'][$field] = $config;
-    }
-
-    public function getConfig($key = null)
-    {
-        if (is_null($key)) {
-            return $this->config;
-        } else {
-            if (isset($this->config[$key])) {
-                return $this->config[$key];
-            } else {
-                return null;
-            }
-        }
-
-    }
-
-    /**
-     * @param array $config
-     * @return Form
-     */
-    public function setConfig(array $config = [])
-    {
-
-        if (!is_array($config)) {
-            //throw new ConfigException('Неправильный конфиг');
-        }
-
-        //  настройки формы
-        $this->config = $this->setDefaultConfig($config);
-        //  настройки полей
-        $this->setDefaultFieldsConfig();
-        // return new Form($this->config, $this);
-    }
-
-    public function getResponse()
-    {
-        return $this->response;
-    }
-
-    public function getNameForm()
-    {
-        return $this->nameForm;
-    }
-
-    /**
-     * Обрабатываем массив настроек формы
+     * Выдаём результат
      *
-     * @param $config
-     */
-    protected function setDefaultConfig($config)
-    {
-        //  одна или много ошибок
-        $config['singleError'] = isset($config['singleError']) ? $config['singleError'] : true;
-
-        //  установим параметры относящиеся к форме
-        new Form($this);
-
-
-        //  формат вывода формы
-        $config['render'] = (isset($config['render']) && is_array($config['render'])) ? $config['render'] : [];
-        $config['render']['format'] = isset($config['render']['format']) ? $config['render']['format'] : 'array';
-
-        return $config;
-    }
-
-    /**
-     * Устанавливаем значения по-умолчанию для полей формы
-     * @return mixed
+     * @param array $fields список полей для рендинга
+     * @return array|string
      * @throws ConfigException
      */
-    protected function setDefaultFieldsConfig()
+    public function render($fields=array())
     {
-        $fieldsConfig = $this->getConfig('fields');
-        $extConfig = $this->getConfig('extensions');
-        if ( !isset($fieldsConfig) ) {
-            return false;
-        }
-
-        foreach ($fieldsConfig as $name => $config) {
-            // тип элемента
-            $type = !isset($config['type']) ? 'text' : $config['type'];
-            $class = 'Nifus\FormBuilder\Fields\\' . ucfirst($type);
-            if (!class_exists($class)) {
-                throw new ConfigException('Не найден класс ' . $class);
-            }
-            $field = new $class($name, $config);
-            $config = $field->getConfig();
-            list($name,$config)= each($config);
-            if ( !is_null($extConfig) ){
-                foreach ($extConfig as $ext) {
-                    $class = 'Nifus\FormBuilder\Extensions\\' . $ext . '';
-                    if (!class_exists($class)) {
-                        throw new ConfigException('Не найден класс ' . $class);
-                    }
-                    $ext = new $class($this->config, $this, null);
-                    $f_config = $ext->configField($config);
-                    if (!is_array($config)) {
-                        throw new ConfigException('Расширение ' . $class . ' должно возвращать массив');
-                    }
-                    $config = array_merge($config,$f_config  );
-                }
-            }
-            $this->setFieldConfig($name,$config);
-
-        }
-
+        $render = new Render($this,$this->response);
+        $render->setFields($this->fields);
+        return $render->render($fields);
     }
+
+
+
+
+
+
+    public function __construct($nameForm,$config=array())
+    {
+        $this->form_name=$nameForm;
+        $this->response = new Response($this);
+        $this->config = array_merge($this->config,$config);
+    }
+
+
+
+    public function set($key,$value){
+        if ( empty($key) ){
+            throw new ConfigException('Пустой ключ');
+        }
+        $this->config[$key]=$value;
+        return $this;
+    }
+
+    public  function __set($key,$value){
+        return $this->set($key,$value);
+    }
+    public  function __get($key){
+        if ( !isset($this->config[$key]) ){
+            return null;
+        }
+        return $this->config[$key];
+    }
+
+
 
 
 }

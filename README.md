@@ -9,7 +9,7 @@ Install
 Formbuilder installs just like any other package, via Composer : `composer require nifus/formbuilder 0.1.x`. 
 
 
-Then if you're using Laravel, add Flatten's Service Provider to you `config/app.php` file :
+Then if you're using Laravel, add Formbuilder's Service Provider to you `config/app.php` file :
 ```php
  	'providers' => array(
         // ...
@@ -62,5 +62,20 @@ Show result
 Extend Fields 
 ===========
 
+
 Extendtions  
 ===========
+
+```php
+	..
+	$form->setExtensions(['Placeholder','Ajax'])
+	..
+```
+
+```php
+	..
+	$form->setRegisterExtension('name',function(){
+		return new \Nifus\FormBuilder\Extensions\AjaxFileLoader; 
+	})
+	..
+```

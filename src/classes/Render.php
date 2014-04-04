@@ -18,19 +18,20 @@ class Render
     ],
         $assetCss = [],
         $staticJs = '';
-    protected
-        $config = [];
-    private
-        $builder = false;
 
-    public function __construct($config, $builder)
+    private
+        $fields,
+        $builder,
+        $response;
+
+    public function __construct($builder,$response)
     {
 
-        $this->config = $config;
         $this->builder = $builder;
+        $this->response = $response;
 
-        self::$assetJs['jquery'] = (false === (self::$assetJs['jquery'])) && !isset($this->config['jquery']) ? false : null;
-        if (isset($this->config['ajax'])) {
+        self::$assetJs['jquery'] = (false === (self::$assetJs['jquery'])) && !isset($this->builder->jquery) ? false : null;
+        if (isset($this->builder->ajax)) {
             self::jsAdd('jquery.form');
         }
         $this->loadExtensions();
@@ -49,15 +50,15 @@ class Render
      */
     protected function loadExtensions()
     {
-        if (!isset($this->config['extensions'])) {
+        if (!isset($this->builder->extensions)) {
             return false;
         }
-        foreach ($this->config['extensions'] as $ext) {
+        foreach ($this->builder->extensions as $ext) {
             $class = 'Nifus\FormBuilder\Extensions\\' . $ext;
             if (!class_exists($class)) {
                 throw new RenderException('Не найден класс ' . $class);
             }
-            $ext = new $class($this->config, $this->builder, $this);
+            $ext = new $class($this->builder);
             $ext->loadAsset();
             //$class::autoload($this);
         }
@@ -81,15 +82,12 @@ class Render
         }
     }
 
-    function getConfig()
-    {
-        return $this->config;
-    }
+
 
     function render($fields = array())
     {
-
-        switch ($this->config['render']['format']) {
+        $render_config = $this->builder->render;
+        switch ($render_config['format']) {
             case('bootstrap3'):
                 if (sizeof($fields) > 0) {
                     return
@@ -132,7 +130,7 @@ class Render
 
                 break;
             default:
-                throw new ConfigException(' Неправильный формат вывода ' . $this->config['render']['format']);
+                throw new ConfigException(' Неправильный формат вывода ' . $render_config['format']);
                 break;
         }
     }
@@ -152,7 +150,7 @@ class Render
      */
     protected function elementRender($name, $config)
     {
-        $response = $this->builder->getResponse();
+
 
 
         $class = 'Nifus\FormBuilder\Fields\\' . ucfirst($config['type']);
@@ -162,7 +160,7 @@ class Render
         $element = new $class($name, $config);
         $element->setBuilder($this->builder);
 
-        return ['label' => $element->renderLabel(), 'element' => $element->renderElement($response)];
+        return ['label' => $element->renderLabel(), 'element' => $element->renderElement($this->response)];
 
     }
 
@@ -213,7 +211,7 @@ class Render
         }
         $result .= self::$staticJs . "
 <script>$(document).ready(function() {
-   $('#" . $this->builder->getNameForm() . "').append($('<input type=\"hidden\" name=\"" . $this->builder->getNameForm() . "_formbuildersubmit\" value=\"1\">'));
+   $('#" . $this->builder->form_name . "').append($('<input type=\"hidden\" name=\"" . $this->builder->form_name . "_formbuildersubmit\" value=\"1\">'));
    ";
         /*
         if ( false!=$this->modelKey ){
@@ -229,7 +227,7 @@ class Render
     protected function tableRender()
     {
         $table = $this->setLine('<table class="formBuilder">');
-        foreach ($this->config['fields'] as $name => $config) {
+        foreach ($this->fields as $name => $config) {
             $elementRender = $this->elementRender($name, $config);
             $table .= $this->setLine('<tr class="' . $name . '">');
             $table .= $this->setLine('<td>');
@@ -253,7 +251,7 @@ class Render
     {
         $show_label = isset($this->config['render']['label']) ? $this->config['render']['label'] : true;
         $par = '';
-        foreach ($this->config['fields'] as $name => $config) {
+        foreach ($this->fields as $name => $config) {
             if (!in_array($name, $fields)) {
                 continue;
             }
@@ -282,7 +280,7 @@ class Render
     {
         $table = '';
 
-        foreach ($this->config['fields'] as $name => $config) {
+        foreach ($this->fields as $name => $config) {
             if (!in_array($name, $fields)) {
                 continue;
             }
@@ -320,10 +318,14 @@ class Render
     protected function arrayRender()
     {
         $elements = array();
-        foreach ($this->config['fields'] as $name => $config) {
+        foreach ($this->fields as $name => $config) {
             $elements[$name] = $this->elementRender($name, $config);
         }
         return $elements;
+    }
+
+    public function setFields(array $fields ){
+        $this->fields = $fields;
     }
 
 
