@@ -6,12 +6,13 @@ namespace Nifus\FormBuilder;
 class RenderView{
 
     private
-        $fields,$jsCode,$cssCode;
+        $fields,$jsCode,$cssCode,$errors;
 
-    function __construct($fields,$js,$css){
+    function __construct($fields,$js,$css,$errors){
         $this->fields = $fields;
         $this->jsCode = $js;
         $this->cssCode = $css;
+        $this->errors = $errors;
     }
     public  function field($key){
         if ( isset($this->fields[$key]) ){
@@ -31,6 +32,15 @@ class RenderView{
     }
     public  function js(){
         return $this->jsCode;
+    }
+
+    public function error(){
+        \Log::info( $this->errors );
+
+        if ( sizeof($this->errors)==0 ){
+            return null;
+        }
+        return  $this->errors;
     }
 
 

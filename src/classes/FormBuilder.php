@@ -6,6 +6,7 @@ class FormBuilder
     protected
         $fields=[],
         $config = [
+            'single_error' => true,
             'method' => 'post',
             'enctype'=>'multipart/form-data'
         ],
@@ -44,8 +45,8 @@ class FormBuilder
         if (!class_exists($class)) {
             throw new ConfigException('Не найден класс ' . $class);
         }
-        $class = new $class($name, $config);
-        return $class->setType($type);
+        $class = new $class($type,$name, $config,null);
+        return $class;
     }
 
 
@@ -123,7 +124,11 @@ class FormBuilder
 
         foreach( $fields as $field ){
             $config = $field->getConfig();
-            $name = $field->getName();
+
+            \Log::info($config);
+            $name = $config['name'];
+            $type = $config['type'];
+            $config = $config['config'];
             if ( isset($fields_config[$name]) ){
                 throw new ConfigException(' name:' . $name.' уже было определено ранее');
             }
@@ -145,7 +150,7 @@ class FormBuilder
 
                 }
             }
-            $this->fields[$name]=$config;
+            $this->fields[$name]=['config'=>$config,'type'=>$type];
         }
         return $this;
     }
@@ -179,10 +184,14 @@ class FormBuilder
 
     public function errors()
     {
-        if ($this->config['singleError']) {
+        if ($this->config['single_error']) {
             return array_shift($this->errors);
         }
         return $this->errors;
+    }
+
+    public function setError($msg){
+        $this->errors[]=$msg;
     }
 
     /**

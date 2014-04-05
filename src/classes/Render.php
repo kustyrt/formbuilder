@@ -50,9 +50,11 @@ class Render
      */
     protected function loadExtensions()
     {
-        if (!isset($this->builder->extensions)) {
+
+        if ( !is_array($this->builder->extensions)) {
             return false;
         }
+
         foreach ($this->builder->extensions as $ext) {
             $class = 'Nifus\FormBuilder\Extensions\\' . $ext;
             if (!class_exists($class)) {
@@ -124,7 +126,7 @@ class Render
             case('dev'):
                 break;
             case('array'):
-                $view = new RenderView($this->arrayRender(), $this->jsRender(), $this->cssRender());
+                $view = new RenderView($this->arrayRender(), $this->jsRender(), $this->cssRender(), $this->errors());
 
                 return $view;
 
@@ -145,20 +147,17 @@ class Render
     /**
      * @param $name
      * @param $config
+     * @param $type
      * @return array
      * @throws RenderException
      */
-    protected function elementRender($name, $config)
+    protected function elementRender($name, $config,$type)
     {
-
-
-
-        $class = 'Nifus\FormBuilder\Fields\\' . ucfirst($config['type']);
+        $class = 'Nifus\FormBuilder\Fields\\' . ucfirst($type);
         if (!class_exists($class)) {
             throw new RenderException('Не найден класс ' . $class);
         }
-        $element = new $class($name, $config);
-        $element->setBuilder($this->builder);
+        $element = new $class($type,$name, $config,$this->builder);
 
         return ['label' => $element->renderLabel(), 'element' => $element->renderElement($this->response)];
 
@@ -228,7 +227,9 @@ class Render
     {
         $table = $this->setLine('<table class="formBuilder">');
         foreach ($this->fields as $name => $config) {
-            $elementRender = $this->elementRender($name, $config);
+            $type = $config['type'];
+            $config = $config['config'];
+            $elementRender = $this->elementRender($name, $config,$type);
             $table .= $this->setLine('<tr class="' . $name . '">');
             $table .= $this->setLine('<td>');
             $table .= $this->setLine($elementRender['label'] . '');
@@ -255,7 +256,10 @@ class Render
             if (!in_array($name, $fields)) {
                 continue;
             }
-            $elementRender = $this->elementRender($name, $config);
+            $type = $config['type'];
+            $config = $config['config'];
+            $elementRender = $this->elementRender($name, $config,$type);
+
             if ( true===$show_label && (!isset($config['inline']) || false===$config['inline'])){
                 $par .= $this->setLine('<p class="' . $name . '">');
                 $par .= $this->setLine($elementRender['label'] . '');
@@ -279,36 +283,31 @@ class Render
     protected function bootstrap3Render($fields = array())
     {
         $table = '';
-
         foreach ($this->fields as $name => $config) {
             if (!in_array($name, $fields)) {
                 continue;
             }
             $table .= $this->setLine('<div class="col-md-6">');
-            $elementRender = $this->elementRender($name, $config);
+            $type = $config['type'];
+            $config = $config['config'];
+            $elementRender = $this->elementRender($name, $config,$type);
+
             if ( is_array($elementRender['element']) ){
                 // 4 checkbox &&  radio
                 $table .= $this->setLine($elementRender['label']);
-
                 $table .= $this->setLine('<div>');
-
                 foreach( $elementRender['element'] as $i=>$element ){
-                    $table .= $this->setLine('<label class="checkbox-inline">
-');
+                    $table .= $this->setLine('<label class="checkbox-inline">');
                     $table .= $this->setLine($elementRender['element'][$i]);
                     $table .= $this->setLine('</label>');
-
                 }
                 $table .= $this->setLine('</div>');
             }else{
                 $table .= $this->setLine($elementRender['label']);
                 $table .= $this->setLine($elementRender['element']);
             }
-
-
             $table .= $this->setLine('</div>');
         }
-
         return $table;
     }
 
@@ -319,13 +318,20 @@ class Render
     {
         $elements = array();
         foreach ($this->fields as $name => $config) {
-            $elements[$name] = $this->elementRender($name, $config);
+            $type = $config['type'];
+            $config = $config['config'];
+
+            $elements[$name] = $this->elementRender($name, $config,$type);
         }
         return $elements;
     }
 
     public function setFields(array $fields ){
         $this->fields = $fields;
+    }
+
+    protected function errors(){
+        return $this->builder->errors();
     }
 
 

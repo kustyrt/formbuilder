@@ -4,90 +4,107 @@ namespace Nifus\FormBuilder;
 
 class Fields
 {
-    public $builder;
 
     protected
-        $config = ['type'=>'text'],
-        $name;
+        $builder,
+        $typeField='text',
+        $config = [];
 
-    public function __construct($name='',array $config){
+
+    public function __construct($typeField,$name='',array $config,$buider){
         $this->config = array_merge($this->config,$config);
-        $this->setName($name);
+        $this->name = $name;
+        $this->builder=$buider;
+        $this->typeField=$typeField;
     }
 
 
-    public function setBuilder($builder){
-        $this->builder = $builder;
-    }
 
 
 
 
     public function setLabel($label)
     {
-        $this->config['label'] =  $label ;
+        $this->label =  $label ;
         return $this;
     }
 
     public function setValue($value)
     {
-        $this->config['value'] =  $value ;
+        $this->value =  $value ;
         return $this;
     }
 
     public function setId($id)
     {
-        $this->config['id'] =  $id ;
+        $this->id =  $id ;
         return $this;
     }
 
     public function setType($type)
     {
-        $this->config['type'] =  $type ;
+        $this->set('type',$type) ;
         return $this;
     }
 
     public function setName($name)
     {
-        $this->config['name'] = $name;
-        $this->name = $name;
+        $this->name=$name;
         return $this;
     }
+
 
     public function setClass($class)
     {
-        $this->config['class'] = $class;
+        $this->class=$class;
         return $this;
     }
 
-    public function getName(){
-        return $this->name;
-    }
+
     public function getConfig(){
-        if ( !isset($this->name)  || empty($this->name) ){
+        if ( !isset($this->config['name'])  || empty($this->config['name']) ){
             throw new ConfigException('Не указан тип поля для данных ' . var_export($this->config,true));
         }
-
         //  подключаем правила доп полей.
         if ( !isset($this->config['label']) ){
-            $this->config['label'] = isset($this->config['title']) ? $this->config['title']  : trans($this->name);
+            $this->config['label'] = isset($this->config['title']) ? $this->config['title']  : trans($this->config['name']);
         }
 
-        $this->config['id'] = isset($this->config['id']) ? $this->config['id'] :   'id_'.$this->clear($this->name);
-
-
-        return $this->config;
+        $this->config['id'] = isset($this->config['id']) ? $this->config['id'] :   'id_'.$this->clear($this->config['name']);
+        return ['type'=>$this->typeField,'name'=>$this->config['name'],'config'=>$this->config];
     }
 
 
     public function renderLabel(){
         return '<label for="'.$this->config['id'].'" >'.$this->config['label'].'</label>';
     }
+    public function renderElement($response){
+        $attrs = $this->renderAttrs();
+        $value = $response->getData($this->config['name']);
+        if ( !is_null($value) ){
+            $attrs.='value="'.htmlspecialchars($value).'"';
+        }
+        return '<input type="'.$this->typeField.'" '.$attrs.' />';
+    }
+
+
+    public function set($key,$value){
+        if ( empty($key) ){
+            throw new ConfigException('Пустой ключ');
+        }
+        $this->config[$key]=$value;
+        return $this;
+    }
+
+    public  function __set($key,$value){
+        return $this->set($key,$value);
+    }
+
+
 
     protected function renderAttrs(){
         $attrs = '';
         foreach($this->config as $k=>$v ){
-
             if ( !is_null($v) && !in_array($k,['data','inline']) ){
                 $attrs.=$k.'="'.$v.'" ';
             }
@@ -95,14 +112,7 @@ class Fields
         return $attrs;
     }
 
-    public function renderElement($response){
-        $attrs = $this->renderAttrs();
-        $value = $response->getData($this->name);
-        if ( !is_null($value) ){
-            $attrs.='value="'.htmlspecialchars($value).'"';
-        }
-        return '<input '.$attrs.' />';
-    }
+
 
     protected function clear($str){
         return strtolower(preg_replace('#[^a-z]#i','',$str));

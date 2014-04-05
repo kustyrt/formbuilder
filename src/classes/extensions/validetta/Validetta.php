@@ -3,18 +3,14 @@ namespace Nifus\FormBuilder\Extensions;
 
 use \Nifus\FormBuilder\Extension as Extension;
 
-class Ajax extends Extension
+class Validetta extends Extension
 {
 
-    static function form()
-    {
-        return true;
-    }
+
 
     public function loadAsset()
     {
         \Nifus\FormBuilder\Render::jsAdd('jquery');
-        \Nifus\FormBuilder\Render::jsAdd('jquery.form','ajax');
 
         // валидация
         \Nifus\FormBuilder\Render::jsAdd('jquery.validate.min', 'validate');
@@ -25,17 +21,11 @@ class Ajax extends Extension
         \Nifus\FormBuilder\Render::cssAdd('validetta', 'validate');
 
 
-        $config = $this->builder->ajax;
-
-        if (!isset($config) || !is_array($config)) {
-            return false;
-        }
 
 
-        $v = \View::make('formbuilder::classes/extensions/ajax/js')
-            ->with('formName', $this->builder->getNameForm())
-            ->with('formName', $this->builder->getNameForm())
-            ->with('formAction', $config['url']);
+
+        $v = \View::make('formbuilder::classes/extensions/validetta/js')
+            ->with('formName', $this->builder->form_name);
         \Nifus\FormBuilder\Render::setJs($v->render(), $v->getPath());
 
 
