@@ -18,7 +18,14 @@ class Fields
         $this->typeField=$typeField;
     }
 
-
+    public function setValid($rules,$msg=null){
+        $rules = (is_array($rules)) ? implode('|',$rules) :  $rules ;
+        $this->set('data-required',$rules);
+        if ( isset($msg) ){
+            $this->set('data-error-msg',$msg);
+        }
+        return $this;
+    }
 
 
 

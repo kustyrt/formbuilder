@@ -20,10 +20,6 @@ class Validetta extends Extension
         }
         \Nifus\FormBuilder\Render::cssAdd('validetta', 'validate');
 
-
-
-
-
         $v = \View::make('formbuilder::classes/extensions/validetta/js')
             ->with('formName', $this->builder->form_name);
         \Nifus\FormBuilder\Render::setJs($v->render(), $v->getPath());
@@ -34,28 +30,20 @@ class Validetta extends Extension
     public function configField($config)
     {
         $result = '';
-        if (!isset($config['required'])) {
+        if (!isset($config['data-required'])) {
             return [];
         }
         $result .= 'required,';
-
-        $types = explode(';', $config['required']);
+        $types = explode('|', $config['data-required']);
 
         foreach ($types as $t) {
-            $t = explode(':', $t);
-            switch ($t[0]) {
-                case('min'):
-                    $result .= 'minLength[' . $t[1] . '],';
-                    break;
-                case('max'):
-                    $result .= 'maxLength[' . $t[1] . '],';
-                    break;
-                case('type'):
-                    $result .= '' . $t[1] . ',';
-                    break;
+            if ( preg_match('#^(min|max):([0-9]*)$#iUs',$t,$search) ){
+                $result .= $search[1].'Length[' . $search[2] . '],';
+            }elseif(preg_match('#^email$#iUs',$t,$search) ){
+                $result .= 'email,';
             }
         }
-        return ['data-validetta' => $result,'required'=>null];
+        return ['data-validetta' => $result];
 
     }
 }

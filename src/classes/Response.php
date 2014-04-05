@@ -9,6 +9,45 @@ class Response{
     function __construct($builder){
         $this->builder = $builder;
     }
+
+    /**
+     * Проверяем форму
+     */
+    public function fails($fields){
+        $rules = $data_config = $errors_msg=[];
+        foreach( $fields as $name=>$config ){
+            $config=$config['config'];
+            if ( !isset($config['data-required']) ){
+                continue;
+            }
+            if ( isset($config['data-error-msg']) ){
+                $errors_msg[$name]=$config['data-error-msg'];
+            }
+
+            $rules[$name][]='required';
+            $parameters = explode(',',$config['data-required']);
+            foreach( $parameters as $parametr ){
+                $rules[$name][]=$parametr;
+            }
+            $data_config[$name] = $this->getResponseData($name);
+        }
+        $check = \Validator::make(
+            $data_config,
+            $rules
+        );
+
+        if ( false===$check->fails() ){
+            return false;
+        }
+        $errors = $check->failed();
+        foreach( $errors as $key=>$info){
+            $msg = isset($errors_msg[$key]) ?  $errors_msg[$key] : $key;
+            $this->builder->setError($msg);
+        }
+
+        return true;
+    }
+
     /**
      *
      */

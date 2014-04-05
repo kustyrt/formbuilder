@@ -125,7 +125,6 @@ class FormBuilder
         foreach( $fields as $field ){
             $config = $field->getConfig();
 
-            \Log::info($config);
             $name = $config['name'];
             $type = $config['type'];
             $config = $config['config'];
@@ -182,6 +181,9 @@ class FormBuilder
         return $response->save($this->fields);
     }
 
+    public function fails(){
+        return $this->response->fails($this->fields);
+    }
     public function errors()
     {
         if ($this->config['single_error']) {
