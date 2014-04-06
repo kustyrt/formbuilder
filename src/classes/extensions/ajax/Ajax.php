@@ -26,6 +26,7 @@ class Ajax extends Extension
 
 
         $config = $this->builder->ajax;
+
         $url = isset($config['url']) ? $config['url'] : '';
         /*if (!isset($config) || !is_array($config)) {
             return false;

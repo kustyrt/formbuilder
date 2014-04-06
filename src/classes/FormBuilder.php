@@ -179,7 +179,7 @@ class FormBuilder
      */
     function save()
     {
-        $response = new Response($this->config);
+        $response = new Response($this);
         return $response->save($this->fields);
     }
 

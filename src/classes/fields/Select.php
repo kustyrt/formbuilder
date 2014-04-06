@@ -65,7 +65,7 @@ class Select extends \Nifus\FormBuilder\Fields{
         if ( !isset($config['method']) ){
             return false;
         }
-        $model = $this->builder->getConfig('model');
+        $model = $this->builder->model;
         $object = new $model;
         $f = $object->$config['method']();
         if (  $f instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany  ){
@@ -137,7 +137,7 @@ class Select extends \Nifus\FormBuilder\Fields{
     private function generateOptionsModel(array $config,array $select){
         $html = '';
 
-        $model = $this->builder->getConfig('model');
+        $model = $this->builder->model;
         $object = new $model;
         $f = $object->$config['method']();
 
@@ -197,14 +197,14 @@ class Select extends \Nifus\FormBuilder\Fields{
     }
 
     private function generateOptionsModelBelongsToMany($object,$select){
+        $config = $this->config['data'];
         $html = '';
         //  получаем модель связанную
         $related = $object->getRelated();
         $table = $object->getTable();
-        $key = $related->getForeignKey();
+        $key = $related->getKeyName();
         $values[]=$key;
         $order = [];
-
         $sql = $related;
         if ( isset($config['order_rules']) ){
             foreach( $config['order_rules'] as $orderKey=>$type ){
