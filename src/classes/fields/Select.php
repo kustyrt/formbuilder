@@ -42,9 +42,9 @@ class Select extends \Nifus\FormBuilder\Fields{
 
 
     public function renderElement($response){
-
+        //\Log::info($response->getData($this->config['name']));
         $attrs = $this->renderAttrs();
-        $data = $this->selectDataFormat( $response->getData($this->name) );
+        $data = $this->selectDataFormat( $response->getData($this->config['name']) );
         $multi='';
         if ( $this->isMultiple( $this->config['data']) ){
             $size= isset( $this->config['data']['size']) ? $this->config['data']['size'] : 5;

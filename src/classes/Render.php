@@ -165,14 +165,16 @@ class Render
 
     protected function formRender($content)
     {
+
         $formAttrs = [
-            'enctype' => $this->config['enctype'],
-            'method' => $this->config['method'],
-            'id' => $this->builder->getNameForm(),
+            'enctype' => $this->builder->enctype,
+            'method' => $this->builder->method,
+            'id' => $this->builder->form_name,
 
         ];
-        if (isset($this->config['action'])) {
-            $formAttrs['url'] = $this->config['action'];
+        $action = $this->builder->action;
+        if (isset($action)) {
+            $formAttrs['url'] = $action;
         }
 
         return \Form::open($formAttrs) . $content . \Form::close();;
@@ -284,7 +286,7 @@ class Render
     {
         $table = '';
         foreach ($this->fields as $name => $config) {
-            if (!in_array($name, $fields)) {
+            if ( sizeof($fields)>0 && !in_array($name, $fields)) {
                 continue;
             }
             $table .= $this->setLine('<div class="col-md-6">');

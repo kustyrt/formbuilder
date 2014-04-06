@@ -11,14 +11,14 @@ class Fields
         $config = [];
 
 
-    public function __construct($typeField,$name='',array $config,$buider){
+    public function __construct($typeField,$name='',array $config,$builder){
         $this->config = array_merge($this->config,$config);
         $this->name = $name;
-        $this->builder=$buider;
+        $this->builder=$builder;
         $this->typeField=$typeField;
     }
 
-    public function setValid($rules,$msg=null){
+    public function setValid($rules='',$msg=null){
         $rules = (is_array($rules)) ? implode('|',$rules) :  $rules ;
         $this->set('data-required',$rules);
         if ( isset($msg) ){

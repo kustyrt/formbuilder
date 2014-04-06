@@ -4,7 +4,7 @@ namespace Nifus\FormBuilder;
 
 class Response{
 
-    private  $builder;
+    private  $builder,$model=false;
 
     function __construct($builder){
         $this->builder = $builder;
@@ -153,23 +153,25 @@ class Response{
             return null;
         }
 
-       /* if ( false===$this->model ){
-            $model = $model::find($this->modelKey);
+        if ( false===$this->model ){
+            $model = $model::find($this->builder->model_key);
             if ( is_null($model) ){
                 return null;
             }
             $this->model=$model;
         }
 
-        $configKey = $this->config['fields'][$key];
-        if ( isset($configKey['data']['method'])   ){
-            $rel = $this->model->$configKey['data']['method']();
+        $configKey = $this->builder->fields[$key];
+        $config=$configKey['config'];
+
+        if ( isset($config['data']['method'])   ){
+            $rel = $this->model->$config['data']['method']();
             if (  $rel instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany  ){
                 return $rel-> getRelatedIds() ;
 
             }
         }
-        return $this->model->$key;*/
+        return $this->model->$key;
 
     }
 

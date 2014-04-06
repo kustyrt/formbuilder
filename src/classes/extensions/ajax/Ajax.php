@@ -26,16 +26,15 @@ class Ajax extends Extension
 
 
         $config = $this->builder->ajax;
-
-        if (!isset($config) || !is_array($config)) {
+        $url = isset($config['url']) ? $config['url'] : '';
+        /*if (!isset($config) || !is_array($config)) {
             return false;
-        }
+        }*/
 
 
         $v = \View::make('formbuilder::classes/extensions/ajax/js')
-            ->with('formName', $this->builder->getNameForm())
-            ->with('formName', $this->builder->getNameForm())
-            ->with('formAction', $config['url']);
+            ->with('formName', $this->builder->form_name )
+            ->with('formAction', $url);
         \Nifus\FormBuilder\Render::setJs($v->render(), $v->getPath());
 
 
@@ -44,28 +43,20 @@ class Ajax extends Extension
     public function configField($config)
     {
         $result = '';
-        if (!isset($config['required'])) {
+        if (!isset($config['data-required'])) {
             return [];
         }
         $result .= 'required,';
-
-        $types = explode(';', $config['required']);
+        $types = explode('|', $config['data-required']);
 
         foreach ($types as $t) {
-            $t = explode(':', $t);
-            switch ($t[0]) {
-                case('min'):
-                    $result .= 'minLength[' . $t[1] . '],';
-                    break;
-                case('max'):
-                    $result .= 'maxLength[' . $t[1] . '],';
-                    break;
-                case('type'):
-                    $result .= '' . $t[1] . ',';
-                    break;
+            if ( preg_match('#^(min|max):([0-9]*)$#iUs',$t,$search) ){
+                $result .= $search[1].'Length[' . $search[2] . '],';
+            }elseif(preg_match('#^email$#iUs',$t,$search) ){
+                $result .= 'email,';
             }
         }
-        return ['data-validetta' => $result,'required'=>null];
+        return ['data-validetta' => $result];
 
     }
 }

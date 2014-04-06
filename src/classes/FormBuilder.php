@@ -4,7 +4,7 @@ namespace Nifus\FormBuilder;
 class FormBuilder
 {
     protected
-        $fields=[],
+        //$fields=[],
         $config = [
             'single_error' => true,
             'method' => 'post',
@@ -121,7 +121,6 @@ class FormBuilder
      */
     public function setFields(array $fields){
         $fields_config=[];
-
         foreach( $fields as $field ){
             $config = $field->getConfig();
 
@@ -149,8 +148,10 @@ class FormBuilder
 
                 }
             }
-            $this->fields[$name]=['config'=>$config,'type'=>$type];
+            $fields_config[$name]=['config'=>$config,'type'=>$type];
         }
+
+        $this->fields=$fields_config;
         return $this;
     }
 
@@ -170,6 +171,7 @@ class FormBuilder
     public function setId($id)
     {
         $this->modelKey = $id;
+        $this->model_key = $id;
     }
 
     /**
