@@ -215,8 +215,8 @@ class Render
    $('#" . $this->builder->form_name . "').append($('<input type=\"hidden\" name=\"" . $this->builder->form_name . "_formbuildersubmit\" value=\"1\">'));
    ";
 
-        if ( false!=$this->builder->model_key ){
-            $result.="$('#".$this->builder->form_name."').append($('<input type=\"hidden\" name=\"".$this->builder->form_name."_formbuilderid\" value=\"".$this->builder->model_key."\">'));";
+        if ( false!=$this->builder->model_key_value ){
+            $result.="$('#".$this->builder->form_name."').append($('<input type=\"hidden\" name=\"".$this->builder->form_name."_formbuilderid\" value=\"".$this->builder->model_key_value."\">'));";
         }
         $result .= "
 });

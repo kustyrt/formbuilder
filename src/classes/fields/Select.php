@@ -5,11 +5,25 @@ namespace Nifus\FormBuilder\Fields;
 class Select extends \Nifus\FormBuilder\Fields{
 
 
-    public function setOrder($rules)
-    {
-        $this->config['data']['order_rules'] = $rules;
+    public function setOrder($key,$sort){
+        $order = isset($this->config['data']['order_rules']) ? $this->config['data']['order_rules'] : [];
+        $order[$key]=$sort;
+        $this->config['data']['order_rules'] = $order;
         return $this;
     }
+
+    public function setOrders($rules){
+        foreach( $rules as $rule ){
+            foreach( $rule as $key=>$sort){
+                $this->setOrder($key,$sort);
+            }
+        }
+        return $this;
+
+    }
+
+
+
     public function setMethod($method)
     {
         $this->config['data']['method'] = $method;
@@ -37,6 +51,11 @@ class Select extends \Nifus\FormBuilder\Fields{
     public function setValue($value)
     {
         $this->config['data']['value'] = $value;
+        return $this;
+    }
+
+    public function setGroup($key){
+        $this->config['data']['group'] = $key;
         return $this;
     }
 
@@ -169,19 +188,29 @@ class Select extends \Nifus\FormBuilder\Fields{
             $values = ['title'];
         }
         $html = '';
+
         //  получаем модель связанную
         $related = $object->getRelated();
-        $key = $related->getForeignKey();   //  ключ связь для основной таблицы
         $mainKey = $related->getKeyName();
         $values[]=$mainKey;
-        $order = [];
+        if ( isset($config['value']) ){
+            preg_match_all('#\{([^}]*)\}#iUs',$config['value'],$find);
+            if (sizeof($find[1])>0){
+                $values=$find[1];
+            }else{
+                $values=[$config['value']];
+                $config['value']='{'.$config['value'].'}';
+            }
+        }else{
+            $values = ['title'];
+        }
         $sql = $related;
         if ( isset($config['order_rules']) ){
             foreach( $config['order_rules'] as $orderKey=>$type ){
                 $sql = $sql->orderBy($orderKey,$type);
             }
         }
-        $items = $sql->get($values);
+        $items = $sql->get();
 
         foreach($items as $item ){
             $selected = in_array($item->$mainKey,$select) ? 'selected="selected"' : '';
@@ -205,6 +234,17 @@ class Select extends \Nifus\FormBuilder\Fields{
         $key = $related->getKeyName();
         $values[]=$key;
         $order = [];
+        if ( isset($config['value']) ){
+            preg_match_all('#\{([^}]*)\}#iUs',$config['value'],$find);
+            if (sizeof($find[1])>0){
+                $values=$find[1];
+            }else{
+                $values=[$config['value']];
+                $config['value']='{'.$config['value'].'}';
+            }
+        }else{
+            $values = ['title'];
+        }
         $sql = $related;
         if ( isset($config['order_rules']) ){
             foreach( $config['order_rules'] as $orderKey=>$type ){
@@ -212,18 +252,44 @@ class Select extends \Nifus\FormBuilder\Fields{
             }
         }
 
-        $items = $sql->get($values);
-
-        foreach($items as $item ){
-            $selected = in_array($item->$key,$select) ? 'selected="selected"' : '';
-            $value = $config['value'];
-            foreach($values as $sqlValue ){
-                $value = str_replace('{'.$sqlValue.'}',$item->$sqlValue,$value);
+        if ( isset($config['group']) ){
+            $roots = $sql->where($config['group'],0)->get();
+            foreach( $roots as $root ){
+                $value = $config['value'];
+                foreach($values as $sqlValue ){
+                    $value = str_replace('{'.$sqlValue.'}',$root->$sqlValue,$value);
+                }
+                $html.='<optgroup label="'.$value.'">';
+                $subs = $sql->where($config['group'],$root->$key)->get();
+                foreach( $subs as $sub ){
+                    $selected = in_array($sub->$key,$select) ? 'selected="selected"' : '';
+                    $value = $config['value'];
+                    foreach($values as $sqlValue ){
+                        $value = str_replace('{'.$sqlValue.'}',$sub->$sqlValue,$value);
+                    }
+                    $html.='<option '.$selected.' value="'.htmlspecialchars($sub->$key).'">'.htmlspecialchars($value).'</option>';
+                }
+                $html.='</optgroup>';
             }
-            $html.='<option '.$selected.' value="'.htmlspecialchars($item->$key).'">'.htmlspecialchars($value).'</option>';
+        }else{
+            $items = $sql->get();
+            foreach($items as $item ){
+                $selected = in_array($item->$key,$select) ? 'selected="selected"' : '';
+                $value = $config['value'];
+                foreach($values as $sqlValue ){
+                    $value = str_replace('{'.$sqlValue.'}',$item->$sqlValue,$value);
+                }
+                $html.='<option '.$selected.' value="'.htmlspecialchars($item->$key).'">'.htmlspecialchars($value).'</option>';
+            }
         }
         return $html;
     }
 
+    private function getGroupArray($items,$group_key){
+        $result = [];
+        foreach($items as $item ){
+
+        }
+    }
 
 }

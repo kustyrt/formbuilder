@@ -61,6 +61,8 @@ class Fields
     }
 
 
+
+
     public function setClass($class)
     {
         $this->class=$class;

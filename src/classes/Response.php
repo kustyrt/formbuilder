@@ -62,15 +62,18 @@ class Response{
         }else{
             $model = new $this->builder->model;
         }
+
         foreach( $fields as $name=>$config ){
-            if ( isset($data_config['method']) ){
-                $object = new $this->config['model'];
-                $f = $object->$data_config['method']();
+            $config=$config['config'];
+            if ( isset($config['data']['method']) ){
+                $object = new $this->builder->model;
+                $f = $object->$config['data']['method']();
                 //  пропускаем
                 if (  $f instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany  ){
                     continue;
                 }
             }
+
             $model->$name = $this->getResponseData($name);
         }
 
@@ -80,36 +83,29 @@ class Response{
         $id = $model-> getKey();
 
         foreach( $fields as $name=>$config ){
-            if ( isset($data_config['method']) ){
-                $f = $model->$data_config['method']();
+            $config=$config['config'];
 
-
+            if ( isset($config['data']['method']) ){
+                $f = $model->$config['data']['method']();
                 //  пропускаем
                 if (  !$f instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany  ){
                     continue;
                 }
 
-                //dd(\Lex\Branch::find(52)->SubCurrency()->get());
-
-                $key = $f->getRelated()->getKeyName();
-
-                $prime_key = $model->getKeyName();
-
-                /*$rows = $f->get();
-                foreach( $rows as $row )
-                {
-                    $row->delete();
-                }*/
+                $key = $f->getForeignKey();
+                $prime_key = $f->getOtherKey();
                 $rows = $this->getResponseData($name);
+
                 $inc=[];
                 if ( is_array($rows) ){
-                    foreach($rows as $k=>$v) {
-                        $inc[]= [$key=>$v,$prime_key=>$id];
+                    foreach($rows as $v) {
+                        $inc[$id][]= $v;
+                    }
+                    foreach( $inc as $id_model=>$keys ){
+                        $f = $model::find($id_model);
+                        $f->$config['data']['method']()->sync($keys);
                     }
                 }
-                $f->sync($inc);
-
-
             }
         }
         return true;
@@ -136,6 +132,8 @@ class Response{
 
 
     protected function getResponseData($key){
+        $key=preg_replace('#\[\]#','',$key);
+
         $config= $this->builder->method;
         switch($config){
             case('post'):
@@ -154,7 +152,7 @@ class Response{
         }
 
         if ( false===$this->model ){
-            $model = $model::find($this->builder->model_key);
+            $model = $model::find($this->builder->model_key_value);
             if ( is_null($model) ){
                 return null;
             }
@@ -168,7 +166,6 @@ class Response{
             $rel = $this->model->$config['data']['method']();
             if (  $rel instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany  ){
                 return $rel-> getRelatedIds() ;
-
             }
         }
         return $this->model->$key;

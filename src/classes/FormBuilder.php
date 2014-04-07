@@ -164,14 +164,17 @@ class FormBuilder
         return $this->set('model',$model);
     }
 
+
+
+
     /**
      * Устанавливаем ключ для загрузки модели
      * @param $id
      */
     public function setId($id)
     {
-        $this->modelKey = $id;
-        $this->model_key = $id;
+        //$this->modelKey = $id;
+        $this->model_key_value = $id;
     }
 
     /**
