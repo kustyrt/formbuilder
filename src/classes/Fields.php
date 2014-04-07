@@ -30,9 +30,15 @@ class Fields
 
 
 
+
     public function setLabel($label)
     {
-        $this->label =  $label ;
+        $this->label =  $label;
+        return $this;
+    }
+    public function setConfig($key,$value)
+    {
+        $this->$key =  $value ;
         return $this;
     }
 
@@ -41,6 +47,8 @@ class Fields
         $this->value =  $value ;
         return $this;
     }
+
+
 
     public function setId($id)
     {

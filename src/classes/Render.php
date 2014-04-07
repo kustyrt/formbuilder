@@ -262,6 +262,7 @@ class Render
             $config = $config['config'];
             $elementRender = $this->elementRender($name, $config,$type);
 
+
             if ( true===$show_label && (!isset($config['inline']) || false===$config['inline'])){
                 $par .= $this->setLine('<p class="' . $name . '">');
                 $par .= $this->setLine($elementRender['label'] . '');

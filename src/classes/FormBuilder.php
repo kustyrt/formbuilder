@@ -60,6 +60,10 @@ class FormBuilder
         $config = array_merge($config,['format'=>$format]);
         return  $this->set('render',$config);
     }
+    public function getRender()
+    {
+        return new Render($this->config, $this);
+    }
 
     /**
      * @param bool $flag
@@ -84,6 +88,7 @@ class FormBuilder
         }
         return $this->set('method',$method);
     }
+
 
     /**
      * @param $action
@@ -268,7 +273,6 @@ class FormBuilder
         }
         return $this->config[$key];
     }
-
 
 
 
