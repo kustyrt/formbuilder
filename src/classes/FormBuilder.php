@@ -119,7 +119,7 @@ class FormBuilder
      * @return $this
      * @throws ConfigException
      */
-    public function setFields(array $fields){
+    public function setFields(array $fields,$title=''){
         $fields_config=[];
         foreach( $fields as $field ){
             $config = $field->getConfig();
@@ -152,6 +152,19 @@ class FormBuilder
         }
 
         $this->fields=$fields_config;
+        return $this;
+    }
+
+
+    /**
+     * Задаём список полей из другой таблицы
+     * @param $method
+     * @param array $fields
+     * @param string $title
+     * @return $this
+     */
+    public function setRelationFields($method,array $fields,$title=''){
+
         return $this;
     }
 

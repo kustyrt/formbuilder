@@ -13,9 +13,12 @@ class Response{
     /**
      * Проверяем форму
      */
-    public function fails($fields){
+    public function fails($fields)
+    {
         $rules = $data_config = $errors_msg=[];
-        foreach( $fields as $name=>$config ){
+
+        foreach( $fields as $name=>$config )
+        {
             $config=$config['config'];
             if ( !isset($config['data-required']) ){
                 continue;
@@ -29,7 +32,7 @@ class Response{
             foreach( $parameters as $parametr ){
                 $rules[$name][]=$parametr;
             }
-            $data_config[$name] = $this->getResponseData($name);
+            $data_config[$name] = $this->findResponseData4Key($name);
         }
         $check = \Validator::make(
             $data_config,
@@ -53,7 +56,7 @@ class Response{
      */
     function save($fields){
         $data_config = $this->builder->data;
-        $id = $this->getResponseData( $this->builder->form_name.'_formbuilderid' );
+        $id = $this->findResponseData4Key( $this->builder->form_name.'_formbuilderid' );
 
         if ( !is_null($id) ){
             $model = $this->builder->model;
@@ -73,8 +76,7 @@ class Response{
                     continue;
                 }
             }
-
-            $model->$name = $this->getResponseData($name);
+            $model->$name = $this->findResponseData4Key($name);
         }
 
 
@@ -94,7 +96,7 @@ class Response{
 
                 $key = $f->getForeignKey();
                 $prime_key = $f->getOtherKey();
-                $rows = $this->getResponseData($name);
+                $rows = $this->findResponseData4Key($name);
 
                 $inc=[];
                 if ( is_array($rows) ){
@@ -116,26 +118,28 @@ class Response{
      * Возвращаем данные переданные формой
      */
     public function responseData(){
-        $responce = [];
-        foreach( $this->config['fields'] as $name=>$config){
-            $value = $this->getResponseData( $name ) ;
-            if ( !is_null($value) ){
-                $responce[$name] = $value;
+        $fields = $this->config['fields'];
+        $data = $this->findResponseAllData();
+        $response = [];
+
+        foreach( $data as $key=>$value ){
+            if ( !isset($fields[$key]) ){
+                continue;
             }
+            $response[$key]=$value;
         }
-        return $responce;
+
+        return $response;
     }
 
-    function setError($error){
-        $this->errors[]=$error;
-    }
-
-
-    protected function getResponseData($key){
+    /**
+     * Ищем по ключу данные переданные в запросе
+     * @param $key
+     * @return null
+     */
+    protected function findResponseData4Key($key){
         $key=preg_replace('#\[\]#','',$key);
-
-        $config= $this->builder->method;
-        switch($config){
+        switch($this->builder->method){
             case('post'):
                 return (isset($_POST[$key])) ? $_POST[$key] : null;
                 break;
@@ -144,6 +148,28 @@ class Response{
                 break;
         }
     }
+
+    /**
+     * Возвращаем масси данных с которым нужно работать
+     * @return mixed
+     */
+    protected function findResponseAllData(){
+        switch($this->builder->method){
+            case('post'):
+                return $_POST;
+                break;
+            case('get'):
+                return $_GET;
+                break;
+        }
+    }
+
+    function setError($error){
+        $this->errors[]=$error;
+    }
+
+
+
 
     protected function getModelData($key){
         $model= $this->builder->model;
@@ -169,25 +195,23 @@ class Response{
             }
         }
         return $this->model->$key;
-
     }
-
-
 
 
     public function getData($key){
         if ( $this->isSubmit() ){
-            return $this->getResponseData($key);
+            return $this->findResponseData4Key($key);
         }else{
             return $this->getModelData($key);
         }
-
     }
+
+
     /**
      * Проверяем отправку формы
      */
     public function isSubmit(){
-        return !is_null($this->getResponseData( $this->builder->form_name.'_formbuildersubmit') ) ? true : false;
+        return !is_null($this->findResponseData4Key( $this->builder->form_name.'_formbuildersubmit') ) ? true : false;
     }
 
 
