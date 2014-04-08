@@ -34,9 +34,9 @@ class Select extends \Nifus\FormBuilder\Fields{
         $this->config['data']['type'] = 'model';
         return $this;
     }
-    public function setDefault($default)
+    public function setDefault($title,$key=0,$add=false)
     {
-        $this->config['data']['default'] = $default;
+        $this->config['data']['default'] = ['value'=>$title,'key'=>$key,'add'=>$add];
         return $this;
     }
     public function setSize($size)
@@ -99,7 +99,7 @@ class Select extends \Nifus\FormBuilder\Fields{
 
     private function selectDataFormat($data=null){
         $config = $this->config['data'];
-        $select = !is_null($data) ? $data : ( isset($config['default']) ? $config['default'] : null)  ;
+        $select = !is_null($data) ? $data : ( isset($config['default']['key']) ? $config['default']['key'] : null)  ;
         if ( !is_array($select) ){
             $select=[$select];
         }
@@ -107,15 +107,19 @@ class Select extends \Nifus\FormBuilder\Fields{
         $config['type'] = (isset($config['type'])) ? $config['type'] :
             (isset($config['method']) ? 'model' : null );
 
+        if ( isset($config['default']['add']) && true===$config['default']['add'] ){
+            $data .= '<option value="'.$config['default']['key'].'">'.$config['default']['value'].'</option>';
+        }
         switch($config['type']){
             case('value'):
-                $data = $this->generateOptionsValue($config['options'],$select);
+
+                $data .= $this->generateOptionsValue($config['options'],$select);
                 break;
             case('key_value'):
-                $data = $this->generateOptionsKeyValue($config['options'],$select);
+                $data .= $this->generateOptionsKeyValue($config['options'],$select);
                 break;
             case('model'):
-                $data = $this->generateOptionsModel($config,$select);
+                $data .= $this->generateOptionsModel($config,$select);
                 break;
         }
         return $data;
