@@ -24,9 +24,10 @@ class Select extends \Nifus\FormBuilder\Fields{
 
 
 
-    public function setMethod($method)
+    public function setMethod($method,$closure='')
     {
         $this->config['data']['method'] = $method;
+        $this->config['data']['closure'] = $closure;
         $this->config['data']['type'] = 'model';
         return $this;
     }
@@ -155,7 +156,6 @@ class Select extends \Nifus\FormBuilder\Fields{
 
     private function generateOptionsModel(array $config,array $select){
         $html = '';
-
         $model = $this->builder->model;
         $object = new $model;
         $f = $object->$config['method']();
@@ -205,6 +205,9 @@ class Select extends \Nifus\FormBuilder\Fields{
             $values = ['title'];
         }
         $sql = $related;
+        if ( isset($config['closure']) ){
+            $sql = $config['closure']($sql);
+        }
         if ( isset($config['order_rules']) ){
             foreach( $config['order_rules'] as $orderKey=>$type ){
                 $sql = $sql->orderBy($orderKey,$type);
