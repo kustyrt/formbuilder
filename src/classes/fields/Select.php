@@ -4,6 +4,9 @@ namespace Nifus\FormBuilder\Fields;
 
 class Select extends \Nifus\FormBuilder\Fields{
 
+    protected $config=[
+        'data'=>[]
+    ];
 
     public function setOrder($key,$sort){
         $order = isset($this->config['data']['order_rules']) ? $this->config['data']['order_rules'] : [];
@@ -24,7 +27,7 @@ class Select extends \Nifus\FormBuilder\Fields{
 
 
 
-    public function setMethod($method,$closure='')
+    public function setMethod($method,$closure=null)
     {
         $this->config['data']['method'] = $method;
         $this->config['data']['closure'] = $closure;
