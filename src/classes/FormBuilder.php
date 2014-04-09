@@ -242,6 +242,12 @@ class FormBuilder
         return $render->render($fields);
     }
 
+    public function renderAssets()
+    {
+        $render = new Render($this,$this->response);
+        //$render->setFields($this->fields);
+        return $render->renderAssets();
+    }
 
 
 

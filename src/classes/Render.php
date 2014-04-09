@@ -84,7 +84,9 @@ class Render
         }
     }
 
-
+    function renderAssets(){
+        return $this->cssRender() .$this->jsRender();
+    }
 
     function render($fields = array())
     {
