@@ -26,6 +26,7 @@ class Autocomplete extends Extension
             return false;
         }*/
         \Nifus\FormBuilder\Render::jsAdd('jquery.autocomplete','Autocomplete');
+        \Nifus\FormBuilder\Render::cssAdd('autocomplete','Autocomplete');
 
         $v = \View::make('formbuilder::classes/extensions/autocomplete/js')
             ->with('id_form', $this->builder->form_name );

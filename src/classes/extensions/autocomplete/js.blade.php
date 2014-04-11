@@ -8,6 +8,7 @@
                 var url = $(this).attr('data-autocomplete-url');
                 var id = $(this).attr('id');
                 $('#'+id).autocomplete({
+                    minChars:2,
                     serviceUrl: url
                 });
 
