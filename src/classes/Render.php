@@ -288,6 +288,7 @@ class Render
     protected function bootstrap3Render($fields = array())
     {
         $table = '';
+
         foreach ($this->fields as $name => $config) {
             if ( sizeof($fields)>0 && !in_array($name, $fields)) {
                 continue;

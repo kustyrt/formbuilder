@@ -122,7 +122,11 @@ class Fields
     protected function renderAttrs(){
         $attrs = '';
         foreach($this->config as $k=>$v ){
+            if ( is_array($v) ){
+                continue;
+            }
             if ( !is_null($v) && !in_array($k,['data','inline']) ){
+
                 $attrs.=$k.'="'.$v.'" ';
             }
         }

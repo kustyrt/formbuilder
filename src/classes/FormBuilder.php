@@ -157,6 +157,7 @@ class FormBuilder
         }
 
         $this->fields=$fields_config;
+        //dd($this->fields);
         return $this;
     }
 
