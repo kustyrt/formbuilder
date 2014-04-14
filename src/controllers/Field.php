@@ -8,14 +8,14 @@ class Field extends \Controller {
     }
 	public function Index($ext,$action)
 	{
-        $class = 'Nifus\FormBuilder\\'.$ext.'Extension';
-
-        if ( !class_exists($class) ){
+        $class = 'Nifus\FormBuilder\Fields\\' . ucfirst($ext);
+        if (!class_exists($class)) {
             die();
         }
 
-        $c = new $class;
-        return $c->$action();
+
+        return $class::$action();
+
     }
 
 

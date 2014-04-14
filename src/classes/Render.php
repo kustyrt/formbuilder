@@ -162,7 +162,6 @@ class Render
         $element = new $class($type,$name, $config,$this->builder);
 
         return ['label' => $element->renderLabel(), 'element' => $element->renderElement($this->response)];
-
     }
 
     protected function formRender($content)
