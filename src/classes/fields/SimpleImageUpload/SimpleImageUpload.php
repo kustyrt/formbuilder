@@ -15,12 +15,26 @@ class SimpleImageUpload extends \Nifus\FormBuilder\Fields\Hidden{
         \Nifus\FormBuilder\Render::jsAdd('jquery');
 
         \Nifus\FormBuilder\Render::jsAdd('imgUpload','SimpleImageUpload');
+        $images  = $response->getData($this->config['name']);
+        $result = '[';
+        if ( !empty($images) ){
+            $images = (explode(',',$images)) ;
+
+            foreach( $images as $image ){
+            $result.="{'fullUrl':'".\Config::get('app.url').'/media/uploads/'.addslashes(trim($image))."',  'endFile':'".\Config::get('app.url').'/media/uploads/'.addslashes(trim($image))."','hash':1},";
+        }
+        }
+        $result .= ']';
 
 
 
 
-        $v = \View::make('formbuilder::classes/fields/SimpleImageUpload/js') ->with('id_form', $this->builder->form_name );
+        $v = \View::make('formbuilder::classes/fields/SimpleImageUpload/js')
+
+            ->with('result', $result)
+            ->with('id_form', $this->builder->form_name );
         //\Nifus\FormBuilder\Render::setJs($v->render(), $v->getPath());
+
         return $v->render();
     }
 
