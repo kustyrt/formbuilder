@@ -97,6 +97,7 @@ class Response{
                 $key = $f->getForeignKey();
                 $prime_key = $f->getOtherKey();
                 $rows = $this->findResponseData4Key($name);
+                \Log::info($_POST['service']);
 
                 $inc=[];
                 if ( is_array($rows) ){

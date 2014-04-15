@@ -8,7 +8,7 @@ class Fields
     protected
         $builder,
         $typeField='text',
-        $config = [];
+        $config = ['data'=>[]];
 
 
     public function __construct($typeField,$name='',array $config,$builder){
@@ -70,6 +70,13 @@ class Fields
 
 
 
+    public function setMethod($method,$closure=null)
+    {
+        $this->config['data']['method'] = $method;
+        $this->config['data']['closure'] = $closure;
+        $this->config['data']['type'] = 'model';
+        return $this;
+    }
 
     public function setClass($class)
     {

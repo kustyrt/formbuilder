@@ -287,12 +287,13 @@ class Render
     protected function bootstrap3Render($fields = array())
     {
         $table = '';
-
+        $render_config = $this->builder->render;
+        $col = isset($render_config['grid']) ? $render_config['grid'] : 'col-md-6';
         foreach ($this->fields as $name => $config) {
             if ( sizeof($fields)>0 && !in_array($name, $fields)) {
                 continue;
             }
-            $table .= $this->setLine('<div class="col-md-6">');
+            $table .= $this->setLine('<div class="'.$col.'">');
             $type = $config['type'];
             $config = $config['config'];
             $elementRender = $this->elementRender($name, $config,$type);

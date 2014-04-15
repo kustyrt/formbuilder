@@ -74,8 +74,8 @@ class SelectImages extends \Nifus\FormBuilder\Fields\Select{
         $folder = $this->config['data']['folder'];
         $html = '';
         foreach($data as $file ){
-            $key = 'http://'.$_SERVER['HTTP_HOST'].'/'.$folder.'/'.basename($file);
-            $selected = in_array($file,$select) ? 'selected="selected"' : '';
+            $key = 'http://'.$_SERVER['HTTP_HOST'].''.$folder.'/'.basename($file);
+            $selected = in_array(basename($file),$select) ? 'selected="selected"' : '';
             $html.='<option '.$selected.' data-img-src="'.htmlspecialchars($key).'" value="'.basename($file).'">'.basename($file).'</option>';
 
         }

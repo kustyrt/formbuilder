@@ -4,7 +4,7 @@
 
         'use strict';
         var url = '{{ route('fb.action',['ext'=>'MultiUpload','action'=>'upload'] )}}',
-            uploadButton = $('<button/>')
+           var uploadButton = $('<button/>')
                 .addClass('btn btn-primary')
                 .prop('disabled', true)
                 .text('Processing...')
