@@ -8,13 +8,14 @@
             {{$formName}}.ajax();
         },
         validate:function(){
-            $("#{{$formName}}").validetta({
-                realTime     : true
-            });
+            if ( $("#{{$formName}} *[data-validetta]").length>0 ){
+                $("#{{$formName}}").validetta({
+                    realTime     : true
+                });
+            }
         },
         ajax:function(){
             var options = {
-
                 @if( !empty($formAction) )
                 'url': '{{$formAction}}',
                 @endif
