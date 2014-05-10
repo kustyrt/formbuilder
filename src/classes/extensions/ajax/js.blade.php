@@ -8,9 +8,9 @@
             {{$formName}}.ajax();
         },
         validate:function(){
-            /*$("#{{$formName}}").validetta({
+            $("#{{$formName}}").validetta({
                 realTime     : true
-            });*/
+            });
         },
         ajax:function(){
             var options = {
