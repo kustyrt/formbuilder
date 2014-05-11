@@ -68,6 +68,8 @@ class Response{
 
         foreach( $fields as $name=>$config ){
             $config=$config['config'];
+            $name = $config['name']=preg_replace('#\[\]#','',$config['name']);
+
             if ( isset($config['data']['method']) ){
                 $object = new $this->builder->model;
                 $f = $object->$config['data']['method']();
@@ -76,7 +78,28 @@ class Response{
                     continue;
                 }
             }
-            $model->$name = $this->findResponseData4Key($name);
+            elseif( isset($config['upload']) && true===$config['upload'] && \Input::hasFile($config['name']) ){
+                //  загрузка файла
+                $object = \Input::file($config['name']);
+
+                $destination_path =  public_path().'/'.$config['data-path'];
+                $names = [];
+                if ( is_array($object) ){
+                    foreach( $object as $file ){
+                        $file_name = $file->getClientOriginalName();
+                        $file->move($destination_path, $file_name);
+                        $names[]=$file_name;
+                    }
+                }else{
+                    $file_name = $object->getClientOriginalName();
+                    $object->move($destination_path, $file_name);
+                    $names[]=$file_name;
+                }
+                $model->$name = $names;
+
+            }else{
+                $model->$name = $this->findResponseData4Key($name);
+            }
         }
 
 
@@ -97,7 +120,7 @@ class Response{
                 $key = $f->getForeignKey();
                 $prime_key = $f->getOtherKey();
                 $rows = $this->findResponseData4Key($name);
-                \Log::info($_POST['service']);
+                //\Log::info($_POST['service']);
 
                 $inc=[];
                 if ( is_array($rows) ){
@@ -188,7 +211,8 @@ class Response{
 
         $configKey = $this->builder->fields[$key];
         $config=$configKey['config'];
-
+        $key = preg_replace('#\[\]#','',$key);
+        \Log::info($key);
         if ( isset($config['data']['method'])   ){
             $rel = $this->model->$config['data']['method']();
             if (  $rel instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany  ){
