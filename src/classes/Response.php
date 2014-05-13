@@ -93,7 +93,7 @@ class Response{
                 }else{
                     $file_name = $object->getClientOriginalName();
                     $object->move($destination_path, $file_name);
-                    $names[]=$file_name;
+                    $names=$file_name;
                 }
                 $model->$name = $names;
 
@@ -103,8 +103,8 @@ class Response{
         }
 
 
-
         $model->save();
+
         $id = $model-> getKey();
 
         foreach( $fields as $name=>$config ){

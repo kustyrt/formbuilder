@@ -17,13 +17,14 @@ class File extends \Nifus\FormBuilder\Fields{
         $url = 'http://'.$_SERVER['HTTP_HOST'].'/'.$this->config['data-path'];
         $elements = '';
         $attrs = $this->renderAttrs();
-        //$name = preg_replace('#\[\]#','',$this->config['name']);
         $files = $response->getData($this->config['name']);
 
         if ( is_array($files) ){
             foreach( $files as $file ){
                 $elements.='<br/><a target="_blank" href="'.$url.'/'.$file.'">'.$file.'</a>&nbsp;&nbsp;<!--<a href="'.route('fb.action',['ext'=>'file','action'=>'delete']).'">удалить</a>-->';
             }
+        }elseif( !empty($files) ){
+            $elements.='<br/><a target="_blank" href="'.$url.'/'.$files.'">'.$files.'</a>&nbsp;&nbsp;';
         }
         $elements.='<br/><input type="file"  '.$attrs.' />';
         return $elements;
