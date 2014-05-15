@@ -9,7 +9,7 @@ namespace Nifus\FormBuilder\Fields;
  */
 class Button extends \Nifus\FormBuilder\Fields{
 
-
+    protected $config=['name'=>'se'];
 
 
     public function setValue($value)

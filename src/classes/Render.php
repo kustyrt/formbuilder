@@ -13,7 +13,6 @@ class Render
     static
         $assetJs = [
         'jquery' => false,
-        //'require'=>null,
         //'engine'=>null
     ],
         $assetCss = [],
@@ -289,30 +288,41 @@ class Render
         $table = '';
         $render_config = $this->builder->render;
         $col = isset($render_config['grid']) ? $render_config['grid'] : 'col-md-6';
-        foreach ($this->fields as $name => $config) {
-            if ( sizeof($fields)>0 && !in_array($name, $fields)) {
-                continue;
+        foreach ($this->fields as $area) {
+            if (  sizeof($this->fields)>1 ){
+                $table .= $this->setLine('<div class="panel panel-default">');
+                $table .= $this->setLine('<div class="panel-body">');
+                $table .= $this->setLine($area['title']);
+                $table .= $this->setLine('</div>');
             }
-            $table .= $this->setLine('<div class="'.$col.'">');
-            $type = $config['type'];
-            $config = $config['config'];
-            $elementRender = $this->elementRender($name, $config,$type);
+            foreach( $area['fields'] as $name => $config){
+                if ( sizeof($fields)>0 && !in_array($name, $fields)) {
+                    continue;
+                }
 
-            if ( is_array($elementRender['element']) ){
-                // 4 checkbox &&  radio
-                $table .= $this->setLine($elementRender['label']);
-                $table .= $this->setLine('<div>');
-                foreach( $elementRender['element'] as $i=>$element ){
-                    $table .= $this->setLine('<label class="checkbox-inline">');
-                    $table .= $this->setLine($elementRender['element'][$i]);
-                    $table .= $this->setLine('</label>');
+                $table .= $this->setLine('<div class="'.$col.'">');
+                $type = $config['type'];
+                $config = $config['config'];
+                $elementRender = $this->elementRender($name, $config,$type);
+
+                if ( is_array($elementRender['element']) ){
+                    // 4 checkbox &&  radio
+                    $table .= $this->setLine($elementRender['label']);
+                    $table .= $this->setLine('<div>');
+                    foreach( $elementRender['element'] as $i=>$element ){
+                        $table .= $this->setLine('<label class="checkbox-inline">');
+                        $table .= $this->setLine($elementRender['element'][$i]);
+                        $table .= $this->setLine('</label>');
+                    }
+                    $table .= $this->setLine('</div>');
+                }else{
+                    $table .= $this->setLine($elementRender['label']);
+                    $table .= $this->setLine($elementRender['element']);
                 }
                 $table .= $this->setLine('</div>');
-            }else{
-                $table .= $this->setLine($elementRender['label']);
-                $table .= $this->setLine($elementRender['element']);
             }
             $table .= $this->setLine('</div>');
+
         }
         return $table;
     }
@@ -323,11 +333,12 @@ class Render
     protected function arrayRender()
     {
         $elements = array();
-        foreach ($this->fields as $name => $config) {
-            $type = $config['type'];
-            $config = $config['config'];
-
-            $elements[$name] = $this->elementRender($name, $config,$type);
+        foreach ($this->fields as $area) {
+            foreach( $area['fields'] as $name => $config){
+                $type = $config['type'];
+                $config = $config['config'];
+                $elements[$name] = $this->elementRender($name, $config,$type);
+            }
         }
         return $elements;
     }

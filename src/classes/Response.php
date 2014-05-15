@@ -17,22 +17,24 @@ class Response{
     {
         $rules = $data_config = $errors_msg=[];
 
-        foreach( $fields as $name=>$config )
+        foreach( $fields as $area )
         {
-            $config=$config['config'];
-            if ( !isset($config['data-required']) ){
-                continue;
-            }
-            if ( isset($config['data-error-msg']) ){
-                $errors_msg[$name]=$config['data-error-msg'];
-            }
+            foreach( $area['fields'] as $name=>$config ){
+                $config=$config['config'];
+                if ( !isset($config['data-required']) ){
+                    continue;
+                }
+                if ( isset($config['data-error-msg']) ){
+                    $errors_msg[$name]=$config['data-error-msg'];
+                }
 
-            $rules[$name][]='required';
-            $parameters = explode(',',$config['data-required']);
-            foreach( $parameters as $parametr ){
-                $rules[$name][]=$parametr;
+                $rules[$name][]='required';
+                $parameters = explode(',',$config['data-required']);
+                foreach( $parameters as $parametr ){
+                    $rules[$name][]=$parametr;
+                }
+                $data_config[$name] = $this->findResponseData4Key($name);
             }
-            $data_config[$name] = $this->findResponseData4Key($name);
         }
         $check = \Validator::make(
             $data_config,

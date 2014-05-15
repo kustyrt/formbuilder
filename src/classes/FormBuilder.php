@@ -4,7 +4,7 @@ namespace Nifus\FormBuilder;
 class FormBuilder
 {
     protected
-        //$fields=[],
+        $fields=[],
         $config = [
             'single_error' => true,
             'method' => 'post',
@@ -78,6 +78,21 @@ class FormBuilder
         return $this;
     }
 
+    public function setLibrary($libs){
+        foreach( $libs as $lib ){
+            switch($lib){
+                case('bootstrap'):
+                    Render::jsAdd('bootstrap');
+                    Render::cssAdd('bootstrap');
+                    break;
+                case('jquery'):
+                    Render::jsAdd('jquery');
+                    break;
+            }
+        }
+        return $this;
+    }
+
     /**
      * @param $method
      * @return $this
@@ -128,7 +143,6 @@ class FormBuilder
         $fields_config=[];
         foreach( $fields as $field ){
             $config = $field->getConfig();
-
             $name = $config['name'];
             $type = $config['type'];
             $config = $config['config'];
@@ -137,27 +151,26 @@ class FormBuilder
             }
             //  расширение
             $exts = $this->extensions;
-            if ( !is_null($exts) ){
-                foreach( $exts as $ext )
-                {
-                    $class = 'Nifus\FormBuilder\Extensions\\'.$ext.'';
-                    if ( !class_exists($class) ){
-                        throw new ConfigException('Не найден класс '.$class);
-                    }
-                    $ext = new $class($this);
-                    $f_config = $ext->configField($config);
-                    if ( !is_array($f_config) ){
-                        throw new ConfigException('Расширение '.$class.' должно возвращать массив');
-                    }
-                    $config = array_merge($config,$f_config  );
-
+            if ( is_null($exts) ){
+                continue;
+            }
+            foreach( $exts as $ext )
+            {
+                $class = 'Nifus\FormBuilder\Extensions\\'.$ext.'';
+                if ( !class_exists($class) ){
+                    throw new ConfigException('Не найден класс '.$class);
                 }
+                $ext = new $class($this);
+                $f_config = $ext->configField($config);
+                if ( !is_array($f_config) ){
+                    throw new ConfigException('Расширение '.$class.' должно возвращать массив');
+                }
+                $config = array_merge($config,$f_config  );
             }
             $fields_config[$name]=['config'=>$config,'type'=>$type];
         }
 
-        $this->fields=$fields_config;
-        //dd($this->fields);
+        $this->fields[]=['title'=>$title,'fields'=>$fields_config];
         return $this;
     }
 
