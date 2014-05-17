@@ -124,7 +124,10 @@ class Fields
         return $this->set($key,$value);
     }
 
+    public  function __get($key){
 
+        return $this->config[$key];
+    }
 
     protected function renderAttrs(){
         $attrs = '';

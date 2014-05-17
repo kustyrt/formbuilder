@@ -57,13 +57,12 @@ class Response{
      *
      */
     function save($fields){
+
         $data_config = $this->builder->data;
         $id = $this->findResponseData4Key( $this->builder->form_name.'_formbuilderid' );
-
         if ( !is_null($id) ){
             $model = $this->builder->model;
             $model = $model::find($id);
-
         }else{
             $model = new $this->builder->model;
         }
@@ -72,12 +71,17 @@ class Response{
             foreach( $area['fields'] as $name=>$config ){
                 $config=$config['config'];
                 $name = $config['name']=preg_replace('#\[\]#','',$config['name']);
-
+                if ( empty($name) ){
+                    continue;
+                }
                 if ( isset($config['data']['method']) ){
                     $object = new $this->builder->model;
                     $f = $object->$config['data']['method']();
                     //  пропускаем
                     if (  $f instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany  ){
+                        continue;
+                    }
+                    if (  $f instanceof \Illuminate\Database\Eloquent\Relations\HasMany  ){
                         continue;
                     }
                 }
@@ -114,19 +118,15 @@ class Response{
         foreach( $fields as $area ){
             foreach( $area['fields'] as $name=>$config ){
                 $config=$config['config'];
-
                 if ( isset($config['data']['method']) ){
                     $f = $model->$config['data']['method']();
                     //  пропускаем
                     if (  !$f instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany  ){
                         continue;
                     }
-
                     $key = $f->getForeignKey();
                     $prime_key = $f->getOtherKey();
                     $rows = $this->findResponseData4Key($name);
-                    //\Log::info($_POST['service']);
-
                     $inc=[];
                     if ( is_array($rows) ){
                         foreach($rows as $v) {
@@ -135,6 +135,46 @@ class Response{
                         foreach( $inc as $id_model=>$keys ){
                             $f = $model::find($id_model);
                             $f->$config['data']['method']()->sync($keys);
+                        }
+                    }
+                }
+            }
+        }
+
+
+        //  Один ко многим
+        foreach( $fields as $area ){
+            foreach( $area['fields'] as $name=>$config ){
+                $config=$config['config'];
+                if ( isset($config['data']['method']) ){
+                    $f = $model->$config['data']['method']();
+                    //  пропускаем
+                    if (  !$f instanceof \Illuminate\Database\Eloquent\Relations\HasMany  ){
+                        continue;
+                    }
+
+                    $key = $f->getPlainForeignKey();
+                    $model = $f->getRelated();
+
+
+                    $rows = $this->findResponseData4Key($name);
+                    $model::where($key,$id)->delete();
+
+
+                    $inc=[];
+                    if ( is_array($rows) ){
+                        $i=0;
+
+                        //$inc[][$key]=$id;
+                        foreach($rows as $v=>$values) {
+                            foreach( $values as $i=>$value ){
+                                $inc[$i][$v]=$value ;
+                                $inc[$i][$key]=$id ;
+
+                            }
+                        }
+                        foreach( $inc as $array ){
+                            $model::insert($array);
                         }
                     }
                 }

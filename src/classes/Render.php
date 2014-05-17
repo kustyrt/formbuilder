@@ -12,7 +12,7 @@ class Render
 {
     static
         $assetJs = [
-        'jquery' => false,
+        //'jquery' => false,
         //'engine'=>null
     ],
         $assetCss = [],
@@ -214,9 +214,9 @@ class Render
 <script>$(document).ready(function() {
    $('#" . $this->builder->form_name . "').append($('<input type=\"hidden\" name=\"" . $this->builder->form_name . "_formbuildersubmit\" value=\"1\">'));
    ";
+        if ( false!=$this->builder->getId() ){
 
-        if ( false!=$this->builder->model_key_value ){
-            $result.="$('#".$this->builder->form_name."').append($('<input type=\"hidden\" name=\"".$this->builder->form_name."_formbuilderid\" value=\"".$this->builder->model_key_value."\">'));";
+            $result.="$('#".$this->builder->form_name."').append($('<input type=\"hidden\" name=\"".$this->builder->form_name."_formbuilderid\" value=\"".$this->builder->getId()."\">'));";
         }
         $result .= "
 });
@@ -283,7 +283,7 @@ class Render
         return $par;
     }
 
-    protected function bootstrap3Render($fields = array())
+    public function bootstrap3Render($fields = array())
     {
         $table = '';
         $render_config = $this->builder->render;
@@ -291,10 +291,12 @@ class Render
         foreach ($this->fields as $area) {
             if (  sizeof($this->fields)>1 ){
                 $table .= $this->setLine('<div class="panel panel-default">');
-                $table .= $this->setLine('<div class="panel-body">');
+                $table .= $this->setLine('<div class="panel-heading">');
                 $table .= $this->setLine($area['title']);
                 $table .= $this->setLine('</div>');
             }
+            $table .= $this->setLine('<div class="panel-body">');
+
             foreach( $area['fields'] as $name => $config){
                 if ( sizeof($fields)>0 && !in_array($name, $fields)) {
                     continue;
@@ -321,6 +323,8 @@ class Render
                 }
                 $table .= $this->setLine('</div>');
             }
+            $table .= $this->setLine('</div>');
+
             $table .= $this->setLine('</div>');
 
         }

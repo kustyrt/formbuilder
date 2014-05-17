@@ -13,6 +13,7 @@ class FormBuilder
         $errors = [],
         $model = false,
         $modelKey = false,
+        $model_key_value = false,
         $response = false;
 
 
@@ -151,22 +152,22 @@ class FormBuilder
             }
             //  расширение
             $exts = $this->extensions;
-            if ( is_null($exts) ){
-                continue;
-            }
-            foreach( $exts as $ext )
-            {
-                $class = 'Nifus\FormBuilder\Extensions\\'.$ext.'';
-                if ( !class_exists($class) ){
-                    throw new ConfigException('Не найден класс '.$class);
+            if ( !is_null($exts) ){
+                foreach( $exts as $ext )
+                {
+                    $class = 'Nifus\FormBuilder\Extensions\\'.$ext.'';
+                    if ( !class_exists($class) ){
+                        throw new ConfigException('Не найден класс '.$class);
+                    }
+                    $ext = new $class($this);
+                    $f_config = $ext->configField($config);
+                    if ( !is_array($f_config) ){
+                        throw new ConfigException('Расширение '.$class.' должно возвращать массив');
+                    }
+                    $config = array_merge($config,$f_config  );
                 }
-                $ext = new $class($this);
-                $f_config = $ext->configField($config);
-                if ( !is_array($f_config) ){
-                    throw new ConfigException('Расширение '.$class.' должно возвращать массив');
-                }
-                $config = array_merge($config,$f_config  );
             }
+
             $fields_config[$name]=['config'=>$config,'type'=>$type];
         }
 
@@ -207,6 +208,12 @@ class FormBuilder
     {
         //$this->modelKey = $id;
         $this->model_key_value = $id;
+        return $this;
+    }
+
+    public function getId()
+    {
+        return $this->model_key_value;
     }
 
     /**
@@ -249,11 +256,15 @@ class FormBuilder
      * @return array|string
      * @throws ConfigException
      */
-    public function render($fields=array())
+    public function render($fields=array(),$get_object=false)
     {
         $render = new Render($this,$this->response);
         $render->setFields($this->fields);
+        if ( false===$get_object ){
         return $render->render($fields);
+        }else{
+            return $render;
+        }
     }
 
     public function renderAssets()
