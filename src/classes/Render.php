@@ -161,8 +161,7 @@ class Render
             throw new RenderException('Не найден класс ' . $class);
         }
         $element = new $class($type,$name, $config,$this->builder);
-
-        return ['label' => $element->renderLabel(), 'element' => $element->renderElement($this->response)];
+        return ['label' => $element->renderLabel(), 'element' => $element->renderElement($this->response),'comment'=>$element->comment];
     }
 
     protected function formRender($content)
@@ -322,6 +321,11 @@ class Render
                 }else{
                     $table .= $this->setLine($elementRender['label']);
                     $table .= $this->setLine($elementRender['element']);
+
+                    if ( isset($elementRender['comment']) && !empty($elementRender['comment']) ){
+                        $table .= $this->setLine('<small>'.$elementRender['comment'].'</small>');
+
+                    }
                 }
                 $table .= $this->setLine('</div>');
             }

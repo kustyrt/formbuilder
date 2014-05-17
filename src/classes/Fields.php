@@ -5,10 +5,11 @@ namespace Nifus\FormBuilder;
 class Fields
 {
 
+
     protected
         $builder,
         $typeField='text',
-        $config = ['data'=>[]];
+        $config = ['data'=>[],'comment'=>null];
 
 
     public function __construct($typeField,$name='',array $config,$builder){
@@ -29,7 +30,11 @@ class Fields
 
 
 
-
+    public function setComment($comment)
+    {
+        $this->comment =  $comment;
+        return $this;
+    }
 
     public function setLabel($label)
     {
@@ -125,8 +130,10 @@ class Fields
     }
 
     public  function __get($key){
-
-        return $this->config[$key];
+        if ( isset($this->config[$key]) ){
+            return $this->config[$key];
+        }
+        return null;
     }
 
     protected function renderAttrs(){
