@@ -161,7 +161,7 @@ class Render
             throw new RenderException('Не найден класс ' . $class);
         }
         $element = new $class($type,$name, $config,$this->builder);
-        return ['label' => $element->renderLabel(), 'element' => $element->renderElement($this->response),'comment'=>$element->comment];
+        return ['label' => $element->renderLabel(), 'element' => $element->renderElement($this->response),'comment'=>$element->comment,'break_line'=>$element->breakLine];
     }
 
     protected function formRender($content)
@@ -302,12 +302,16 @@ class Render
                 if ( sizeof($fields)>0 && !in_array($name, $fields)) {
                     continue;
                 }
-
-                $table .= $this->setLine('<div class="'.$col.'">');
                 $type = $config['type'];
                 $config = $config['config'];
+
                 $elementRender = $this->elementRender($name, $config,$type);
 
+                if ( true === $elementRender['break_line'] ){
+                    $table .= $this->setLine('<div class="col-md-10">');
+                }else{
+                    $table .= $this->setLine('<div class="'.$col.'">');
+                }
                 if ( is_array($elementRender['element']) ){
                     // 4 checkbox &&  radio
                     $table .= $this->setLine($elementRender['label']);
@@ -319,7 +323,9 @@ class Render
                     }
                     $table .= $this->setLine('</div>');
                 }else{
+                    if ( !is_null($elementRender['label'])){
                     $table .= $this->setLine($elementRender['label']);
+                    }
                     $table .= $this->setLine($elementRender['element']);
 
                     if ( isset($elementRender['comment']) && !empty($elementRender['comment']) ){
@@ -328,6 +334,9 @@ class Render
                     }
                 }
                 $table .= $this->setLine('</div>');
+
+
+
             }
             $table .= $this->setLine('</div>');
 

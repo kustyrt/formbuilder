@@ -5,6 +5,8 @@ namespace Nifus\FormBuilder;
 class Fields
 {
 
+    public
+        $breakLine = false;
 
     protected
         $builder,
@@ -140,6 +142,7 @@ class Fields
         }
         return null;
     }
+
 
     protected function renderAttrs(){
         $attrs = '';
