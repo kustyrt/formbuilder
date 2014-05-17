@@ -134,6 +134,7 @@ class Response{
                         }
                         foreach( $inc as $id_model=>$keys ){
                             $f = $model::find($id_model);
+                        $f->$config['data']['method']()->sync([]);
                             $f->$config['data']['method']()->sync($keys);
                         }
                     }
