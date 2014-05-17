@@ -71,6 +71,7 @@ class Response{
             foreach( $area['fields'] as $name=>$config ){
                 $config=$config['config'];
                 $name = $config['name']=preg_replace('#\[\]#','',$config['name']);
+
                 if ( empty($name) ){
                     continue;
                 }
@@ -79,13 +80,16 @@ class Response{
                     $f = $object->$config['data']['method']();
                     //  пропускаем
                     if (  $f instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany  ){
+
                         continue;
                     }
                     if (  $f instanceof \Illuminate\Database\Eloquent\Relations\HasMany  ){
+
                         continue;
                     }
                 }
-                elseif( isset($config['upload']) && true===$config['upload'] && \Input::hasFile($config['name']) ){
+
+                if( isset($config['upload']) && true===$config['upload'] && \Input::hasFile($config['name']) ){
                     //  загрузка файла
                     $object = \Input::file($config['name']);
 
@@ -105,6 +109,7 @@ class Response{
                     $model->$name = $names;
 
                 }else{
+
                     $model->$name = $this->findResponseData4Key($name);
                 }
             }
@@ -249,7 +254,9 @@ class Response{
         }
 
         if ( false===$this->model ){
-            $model = $model::find($this->builder->model_key_value);
+
+            $model = $model::find($this->builder->getId());
+
             if ( is_null($model) ){
                 return null;
             }
@@ -259,7 +266,6 @@ class Response{
         $configKey = $this->builder->fields[$key];
         $config=$configKey['config'];
         $key = preg_replace('#\[\]#','',$key);
-        \Log::info($key);
         if ( isset($config['data']['method'])   ){
             $rel = $this->model->$config['data']['method']();
             if (  $rel instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany  ){
