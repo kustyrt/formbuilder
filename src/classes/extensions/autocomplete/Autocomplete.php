@@ -33,7 +33,6 @@ class Autocomplete extends Extension
 
         \Nifus\FormBuilder\Render::setJs($v->render(), $v->getPath());
 
-            \Log::info($v->render());
     }
 
     public function configField($config)

@@ -134,12 +134,6 @@ class FormBuilder
         return $this->set('extensions',$extensions);
     }
 
-    /**
-     *
-     * @param array $fields
-     * @return $this
-     * @throws ConfigException
-     */
     public function setFields(array $fields,$title=''){
         $fields_config=[];
         foreach( $fields as $field ){
