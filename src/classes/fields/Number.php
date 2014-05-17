@@ -2,7 +2,7 @@
 
 namespace Nifus\FormBuilder\Fields;
 
-class Number extends \Nifus\FormBuilder\Text{
+class Number extends \Nifus\FormBuilder\Fields{
 
     public function renderElement($response){
         $attrs = $this->renderAttrs();

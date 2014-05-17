@@ -88,6 +88,11 @@ class Fields
         $this->class=$class;
         return $this;
     }
+    public function setDefault($value)
+    {
+        $this->config['default'] = $value;
+        return $this;
+    }
 
 
     public function getConfig(){
@@ -142,7 +147,7 @@ class Fields
             if ( is_array($v) ){
                 continue;
             }
-            if ( !is_null($v) && !in_array($k,['data','inline']) ){
+            if ( !is_null($v) && !in_array($k,['data','inline','default']) ){
 
                 $attrs.=$k.'="'.$v.'" ';
             }
