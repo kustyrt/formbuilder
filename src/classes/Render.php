@@ -28,10 +28,11 @@ class Render
 
         $this->builder = $builder;
         $this->response = $response;
-
-        if ( isset(self::$assetJs['jquery']) ){
-            self::$assetJs['jquery'] = (false === (self::$assetJs['jquery'])) && !isset($this->builder->jquery) ? false : null;
+        if ( !isset(self::$assetJs['jquery']) ){
+            self::$assetJs['jquery'] = false;
         }
+        self::$assetJs['jquery'] = (false === (self::$assetJs['jquery'])) && !isset($this->builder->jquery) ? false : null;
+
         if (isset($this->builder->ajax)) {
             self::jsAdd('jquery.form');
         }
