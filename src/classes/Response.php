@@ -223,6 +223,7 @@ class Response{
                 return (isset($_GET[$key])) ? $_GET[$key] : null;
                 break;
         }
+        return null;
     }
 
     /**
@@ -254,9 +255,7 @@ class Response{
         }
 
         if ( false===$this->model ){
-
             $model = $model::find($this->builder->getId());
-
             if ( is_null($model) ){
                 return null;
             }

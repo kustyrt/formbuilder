@@ -141,7 +141,7 @@ class FormBuilder
             $name = $config['name'];
             $type = $config['type'];
             $config = $config['config'];
-            if ( isset($fields_config[$name]) ){
+            if ( !empty($name) && isset($fields_config[$name]) ){
                 throw new ConfigException(' name:' . $name.' уже было определено ранее');
             }
             //  расширение

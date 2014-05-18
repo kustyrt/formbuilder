@@ -16,7 +16,6 @@ class SubHeader extends \Nifus\FormBuilder\Fields{
     public function setValue($value)
     {
         $this->label = $value;
-        $this->name = md5(time()+rand(0,1000));
         return $this;
     }
 
