@@ -5,8 +5,10 @@
 
         o2more.init('{{$id_form}}');
 
-        o2more.setCols({{$cols}});
+        //o2more.setCols({{$cols}});
         //o2more.setData({{$data}});
-        o2more.render();
+        //o2more.render();
+        $('#sbt_form').validator()
+
     });
 </script>

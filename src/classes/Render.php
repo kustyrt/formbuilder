@@ -19,6 +19,7 @@ class Render
         $staticJs = '';
 
     private
+        $withOutForm='',
         $fields,
         $builder,
         $response;
@@ -28,11 +29,12 @@ class Render
 
         $this->builder = $builder;
         $this->response = $response;
+        /*
         if ( !isset(self::$assetJs['jquery']) ){
             self::$assetJs['jquery'] = false;
         }
         self::$assetJs['jquery'] = (false === (self::$assetJs['jquery'])) && !isset($this->builder->jquery) ? false : null;
-
+*/
         if (isset($this->builder->ajax)) {
             self::jsAdd('jquery.form');
         }
@@ -101,6 +103,7 @@ class Render
                 } else {
                     return
                         $this->formRender($this->bootstrap3Render()) .
+                        $this->withOutFormRender().
                         $this->cssRender() .
                         $this->jsRender();
                 }
@@ -131,9 +134,7 @@ class Render
                 break;
             case('array'):
                 $view = new RenderView($this->arrayRender(), $this->jsRender(), $this->cssRender(), $this->errors());
-
                 return $view;
-
                 break;
             default:
                 throw new ConfigException(' Неправильный формат вывода ' . $render_config['format']);
@@ -162,8 +163,11 @@ class Render
             throw new RenderException('Не найден класс ' . $class);
         }
         $element = new $class($type,$name, $config,$this->builder);
-        return ['label' => $element->renderLabel(), 'element' => $element->renderElement($this->response),'comment'=>$element->comment,'break_line'=>$element->breakLine];
+        return ['label' => $element->renderLabel(), 'element' => $element->renderElement($this->response),'comment'=>$element->comment,'break_line'=>$element->breakLine,'render_with_out_form'=>$element->renderWithOutForm($this->response)];
     }
+
+
+
 
     protected function formRender($content)
     {
@@ -285,6 +289,12 @@ class Render
         return $par;
     }
 
+    public function withOutFormRender(){
+        return $this->withOutForm;
+    }
+    public function setWithOutForm($html){
+        $this->withOutForm .= $html;
+    }
     public function bootstrap3Render($fields = array())
     {
         $table = '';
@@ -298,16 +308,17 @@ class Render
                 $table .= $this->setLine('</div>');
             }
             $table .= $this->setLine('<div class="panel-body">');
-
             foreach( $area['fields'] as $name => $config){
                 if ( sizeof($fields)>0 && !in_array($name, $fields)) {
                     continue;
                 }
                 $type = $config['type'];
                 $config = $config['config'];
-
                 $elementRender = $this->elementRender($name, $config,$type);
 
+                if ( false!==$elementRender['render_with_out_form']){
+                    $this->setWithOutForm($elementRender['render_with_out_form']);
+                }
                 if ( true === $elementRender['break_line'] ){
                     $table .= $this->setLine('<div class="col-md-10">');
                 }else{

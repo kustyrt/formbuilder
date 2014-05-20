@@ -24,7 +24,7 @@ class Radio extends \Nifus\FormBuilder\Fields{
     protected function renderAttrs(){
         $attrs = '';
         foreach($this->config as $k=>$v ){
-            if ( !is_null($v) && !in_array($k,['data','id']) ){
+            if ( !is_null($v) && !in_array($k,['data','id','value','type']) ){
                 $attrs.=$k.'="'.$v.'" ';
             }
         }
@@ -37,7 +37,6 @@ class Radio extends \Nifus\FormBuilder\Fields{
         $data = is_null($data ) ? ( isset($this->config['data']['default']) ? $this->config['data']['default'] : '' ) : $data;
         $elements = [];
         foreach( $this->config['data']['options'] as $key=>$value ){
-
             $checked = ($key==$data) ? 'checked="checked"' : '';
             $elements[]='<input type="radio" '.$attrs.' '.$checked.' value="'.htmlspecialchars($key).'" />&nbsp;'.$value.'';
         }

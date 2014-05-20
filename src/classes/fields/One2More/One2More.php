@@ -8,6 +8,7 @@ class One2More extends \Nifus\FormBuilder\Fields{
     public function __construct($typeField,$name='', array $config,$builder){
         parent::__construct($typeField,$name, $config,$builder);
         \Nifus\FormBuilder\Render::jsAdd('One2More','One2More');
+
     }
 
     static function delete(){
@@ -52,7 +53,7 @@ class One2More extends \Nifus\FormBuilder\Fields{
         return $this;
     }
 
-    public function renderElement($response){
+    public function renderWithOutForm($response){
 
         $rows = $this->__getData();
         $v = \View::make('formbuilder::classes/fields/One2More/js')
@@ -70,28 +71,30 @@ class One2More extends \Nifus\FormBuilder\Fields{
         $render_views = $this->config['form']->render($fields,true);
         $form = ($render_views->bootstrap3Render($names));
 
-        return '
-        <div><div class="container" id="container_'.$this->config['name'].'"></div></div>
-        <button type="button" class="btn btn-primary" data-action="create">Добавить</button>
-         <div  class="modal fade" id="modal_sub_data" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
+        return '<div  class="modal fade" id="modal_sub_data" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" id="modal_'.$this->config['name'].'">
               <div class="modal-content">
-                <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                  <h4 class="modal-title">Добавить</h4>
+                <form  method="post" id="sbt_form" data-toggle="validator">
+
+                <div class="modal-body"><div class="row">'.$form.'</div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                      <button type="submit" class="btn btn-primary" data-action="save" data-elements="'.$this->config['name'].'">Сохранить</button>
+                    </div>
                 </div>
-                <div class="modal-body">
-                <div class="row">
-                  '.$form.'
-                  </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
-                  <button type="button" class="btn btn-primary" data-action="save" data-elements="'.$this->config['name'].'">Сохранить</button>
+                </form>
                 </div>
-              </div><!-- /.modal-content -->
-            </div><!-- /.modal-dialog -->
-          </div><!-- /.modal -->
+          </div>
         </div>';
+    }
+
+    public function renderElement($response){
+
+
+        return '
+            <div><div class="container" id="container_'.$this->config['name'].'"></div></div>
+            <button type="button" class="btn btn-primary" data-action="create">Добавить</button>
+         ';
     }
 
     private function __getData(){

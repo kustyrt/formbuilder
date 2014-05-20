@@ -31,7 +31,9 @@ class Fields
     }
 
 
-
+    public  function renderWithOutForm($response){
+        return false;
+    }
     public function setComment($comment)
     {
         $this->comment =  $comment;
@@ -90,6 +92,7 @@ class Fields
         $this->class=$class;
         return $this;
     }
+
     public function setDefault($value)
     {
         $this->config['default'] = $value;
@@ -124,7 +127,7 @@ class Fields
     }
 
 
-    public function set($key,$value){
+    public function set($key,$value=null){
         if ( empty($key) ){
             throw new ConfigException('Пустой ключ');
         }

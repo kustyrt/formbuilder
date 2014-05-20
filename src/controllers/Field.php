@@ -12,12 +12,8 @@ class Field extends \Controller {
         if (!class_exists($class)) {
             die();
         }
-
-
         return $class::$action();
-
     }
-
 
 
 
