@@ -143,7 +143,7 @@ class Select extends \Nifus\FormBuilder\Fields{
         return $html;
     }
 
-    private function generateOptionsValue(array $data,array $select){
+    protected  function generateOptionsValue(array $data,array $select){
         $html = '';
         foreach($data as $key=>$value ){
             if ( is_array($value) ){
