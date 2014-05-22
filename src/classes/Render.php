@@ -12,7 +12,7 @@ class Render
 {
     static
         $assetJs = [
-        //'jquery' => false,
+        'jquery' => false,
         //'engine'=>null
     ],
         $assetCss = [],

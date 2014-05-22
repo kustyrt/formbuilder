@@ -29,6 +29,7 @@ class Select extends \Nifus\FormBuilder\Fields{
 
     public function setMethod($method,$closure=null)
     {
+
         $this->config['data']['method'] = $method;
         $this->config['data']['closure'] = $closure;
         $this->config['data']['type'] = 'model';
@@ -42,6 +43,11 @@ class Select extends \Nifus\FormBuilder\Fields{
     public function setSize($size)
     {
         $this->config['data']['size'] = $size;
+        return $this;
+    }
+    public function setMultiple($flag=false)
+    {
+        $this->config['data']['multiple'] = $flag;
         return $this;
     }
 
@@ -68,6 +74,7 @@ class Select extends \Nifus\FormBuilder\Fields{
         //\Log::info($response->getData($this->config['name']));
         $attrs = $this->renderAttrs();
         $data = $this->selectDataFormat( $response->getData($this->config['name']) );
+
         $multi='';
         if ( $this->isMultiple( $this->config['data']) ){
             $size= isset( $this->config['data']['size']) ? $this->config['data']['size'] : 5;
@@ -92,12 +99,16 @@ class Select extends \Nifus\FormBuilder\Fields{
         $object = new $model;
         $f = $object->$config['method']();
         if (  $f instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany  ){
+            if ( isset($config['multiple']) && false===$config['multiple'] ){
+                return false;
+            }
             return true;
         }
         return false;
     }
 
     private function selectDataFormat($data=null){
+
         $config = $this->config['data'];
         $select = !is_null($data) ? $data : ( isset($config['default']['key']) ? $config['default']['key'] : null)  ;
         if ( !is_array($select) ){
@@ -143,7 +154,7 @@ class Select extends \Nifus\FormBuilder\Fields{
         return $html;
     }
 
-    protected  function generateOptionsValue(array $data,array $select){
+    private function generateOptionsValue(array $data,array $select){
         $html = '';
         foreach($data as $key=>$value ){
             if ( is_array($value) ){
@@ -236,6 +247,7 @@ class Select extends \Nifus\FormBuilder\Fields{
     }
 
     private function generateOptionsModelBelongsToMany($object,$select){
+
         $config = $this->config['data'];
         $html = '';
         //  получаем модель связанную
@@ -283,6 +295,7 @@ class Select extends \Nifus\FormBuilder\Fields{
             }
         }else{
             $items = $sql->get();
+
             foreach($items as $item ){
                 $selected = in_array($item->$key,$select) ? 'selected="selected"' : '';
                 $value = $config['value'];

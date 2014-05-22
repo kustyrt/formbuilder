@@ -249,7 +249,9 @@ class Response{
 
 
     protected function getModelData($key){
+
         $model= $this->builder->model;
+
         if ( is_null($model) ){
             return null;
         }
@@ -261,17 +263,32 @@ class Response{
             }
             $this->model=$model;
         }
+        foreach( $this->builder->fields as $fields ){
+            \Log::info( $fields );
 
-        $configKey = $this->builder->fields[$key];
-        $config=$configKey['config'];
-        $key = preg_replace('#\[\]#','',$key);
-        if ( isset($config['data']['method'])   ){
-            $rel = $this->model->$config['data']['method']();
-            if (  $rel instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany  ){
-                return $rel-> getRelatedIds() ;
+            foreach( $fields as $title=>$conf ){
+                if ( isset($conf[$key]) ){
+                    $configKey = $conf[$key];
+                    $config=$configKey['config'];
+                    $key = preg_replace('#\[\]#','',$key);
+
+                    if ( isset($config['data']['method'])   ){
+
+                        $rel = $this->model->$config['data']['method']();
+                        if (  $rel instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany  ){
+
+                            return $rel-> getRelatedIds() ;
+                        }
+                    }
+                    return $this->model->$key;
+                }
             }
+            //\Log::info( $fields );
+
+
         }
-        return $this->model->$key;
+
+
     }
 
 

@@ -3,8 +3,10 @@ namespace Nifus\FormBuilder;
 
 class FormBuilder
 {
+    public
+        $fields=[];
     protected
-        $fields=[],
+
         $config = [
             'single_error' => true,
             'method' => 'post',
