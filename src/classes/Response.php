@@ -264,7 +264,6 @@ class Response{
             $this->model=$model;
         }
         foreach( $this->builder->fields as $fields ){
-            \Log::info( $fields );
 
             foreach( $fields as $title=>$conf ){
                 if ( isset($conf[$key]) ){
