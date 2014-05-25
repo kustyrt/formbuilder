@@ -71,9 +71,13 @@ class One2More extends \Nifus\FormBuilder\Fields{
         $render_views = $this->config['form']->render($fields,true);
         $form = ($render_views->bootstrap3Render($names));
 
-        return '<div  class="modal fade" id="modal_sub_data" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        return '<div  class="modal fade" id="modal_sub_data" role="dialog" aria-hidden="true" tabindex="-1"  >
             <div class="modal-dialog" id="modal_'.$this->config['name'].'">
               <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">'.$this->config['label'].'</h4>
+                  </div>
                 <form  method="post" id="'.$this->config['name'].'" novalidate>
                 <div class="modal-body"><div class="row">'.$form.'</div>
                     <div class="modal-footer">
