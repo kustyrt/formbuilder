@@ -115,7 +115,7 @@ class Fields
 
 
     public function renderLabel(){
-        return '<label for="'.$this->config['id'].'" >'.$this->config['label'].'</label>';
+        return '<label class="control-label" for="'.$this->config['id'].'" >'.$this->config['label'].'</label>';
     }
     public function renderElement($response){
         $attrs = $this->renderAttrs();

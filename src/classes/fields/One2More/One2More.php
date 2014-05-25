@@ -74,8 +74,7 @@ class One2More extends \Nifus\FormBuilder\Fields{
         return '<div  class="modal fade" id="modal_sub_data" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog" id="modal_'.$this->config['name'].'">
               <div class="modal-content">
-                <form  method="post" id="sbt_form" data-toggle="validator">
-
+                <form  method="post" id="'.$this->config['name'].'" novalidate>
                 <div class="modal-body"><div class="row">'.$form.'</div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
@@ -93,7 +92,7 @@ class One2More extends \Nifus\FormBuilder\Fields{
 
         return '
             <div><div class="container" id="container_'.$this->config['name'].'"></div></div>
-            <button type="button" class="btn btn-primary" data-action="create">Добавить</button>
+            <button type="button" class="btn btn-primary" data-action="create" data-form="'.$this->config['name'].'">Добавить</button>
          ';
     }
 
@@ -103,7 +102,7 @@ class One2More extends \Nifus\FormBuilder\Fields{
         $model = $this->builder->model;
         $rows = [];
         $id = $this->builder->getId();
-        if ( false!==$id ){
+        if ( $id>0 ){
             $instance = $model::find($id);
             $result = $instance->$method()->get();
             $values = $this->config['values'];

@@ -35,7 +35,7 @@ var One2More = function () {
                 One2More.edit(null);
             }
             if (action == 'save') {
-               // $('#sbt_form').submit();
+               $('#sbt_form').submit();
             }
         });
         this.valid();
@@ -82,6 +82,7 @@ var One2More = function () {
 
     this.edit = function (id) {
         this.modal.html(this.htmlTmpl);
+        alert( $('#modal_sub_data').length )
         $('#modal_sub_data').modal('show');
         if (id != null) {
             var data = this.data[id];

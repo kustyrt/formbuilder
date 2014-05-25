@@ -322,14 +322,14 @@ class Render
                 if ( true === $elementRender['break_line'] ){
                     $table .= $this->setLine('<div class="col-md-10">');
                 }else{
-                    $table .= $this->setLine('<div class="'.$col.'">');
+                    $table .= $this->setLine('<div class="'.$col.' control-group">');
                 }
                 if ( is_array($elementRender['element']) ){
                     // 4 checkbox &&  radio
                     $table .= $this->setLine($elementRender['label']);
                     $table .= $this->setLine('<div>');
                     foreach( $elementRender['element'] as $i=>$element ){
-                        $table .= $this->setLine('<label class="checkbox-inline">');
+                        $table .= $this->setLine('<label class="checkbox-inline control-label">');
                         $table .= $this->setLine($elementRender['element'][$i]);
                         $table .= $this->setLine('</label>');
                     }

@@ -3,7 +3,7 @@ namespace Nifus\FormBuilder\Extensions;
 
 use \Nifus\FormBuilder\Extension as Extension;
 
-class BootstrapValidator extends Extension
+class Validator extends Extension
 {
 
 
@@ -13,11 +13,11 @@ class BootstrapValidator extends Extension
         \Nifus\FormBuilder\Render::jsAdd('jquery');
 
         // валидация
-        \Nifus\FormBuilder\Render::jsAdd('validator', 'bootstrap-validator/dist');
+        \Nifus\FormBuilder\Render::jsAdd('validator', 'validator');
 
 
-        $v = \View::make('formbuilder::classes/extensions/bootstrapValidator/js')
-            ->with('formName', $this->builder->form_name);
+        $v = \View::make('formbuilder::classes/extensions/validator/js')
+            ->with('form_id', $this->builder->form_name);
         \Nifus\FormBuilder\Render::setJs($v->render(), $v->getPath());
 
 
@@ -25,7 +25,7 @@ class BootstrapValidator extends Extension
 
     public function configField($config)
     {
-        $result = '';
+        /*$result = '';
         if (!isset($config['data-required'])) {
             return [];
         }
@@ -38,8 +38,8 @@ class BootstrapValidator extends Extension
             }elseif(preg_match('#^email$#iUs',$t,$search) ){
                 $result .= 'email,';
             }
-        }
-        return ['data-validetta' => $result];
+        }*/
+        return [];
 
     }
 }

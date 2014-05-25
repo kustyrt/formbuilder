@@ -44,6 +44,11 @@ class Select extends \Nifus\FormBuilder\Fields{
         $this->config['data']['size'] = $size;
         return $this;
     }
+    public function setMultiple($flag=false)
+    {
+        $this->config['data']['multiple'] = $flag;
+        return $this;
+    }
 
     public function setOptions(array $options,$type='key_value')
     {
@@ -92,6 +97,9 @@ class Select extends \Nifus\FormBuilder\Fields{
         $object = new $model;
         $f = $object->$config['method']();
         if (  $f instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany  ){
+            if ( isset($config['multiple']) && false===$config['multiple'] ){
+                return false;
+            }
             return true;
         }
         return false;
