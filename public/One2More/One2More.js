@@ -18,7 +18,7 @@ var One2More = function () {
     this.init = function (form) {
         this.modal = $('#modal_' + form).find('div.modal-body div.row');
         this.htmlTmpl = this.modal.html();
-        this.modal.html('')
+        this.modal.html('');
         this.form = form;
         var One2More = this;
         $('body').on('click', 'button[data-action]', function () {
@@ -35,25 +35,32 @@ var One2More = function () {
                 One2More.edit(null);
             }
             if (action == 'save') {
-               $('#sbt_form').submit();
-            }
-        });
-        this.valid();
 
+               //$('#sbt_form').submit();
+            }
+
+        });
+        $('#modal_sub_data').find('button[data-action="save"]').click(function(){
+            form = $('#modal_sub_data').find('form');
+            var valid = new Validator( $('#'+One2More.form).attr('id') );
+            if ( valid.check() ){
+                One2More.save($(this));
+            }else{
+                return false;
+            }
+        })
+        //this.valid();
     };
 
 
 
-    this.valid = function(){
+    /*this.valid = function(){
         var One2More = this;
+    }*/
 
-
-    }
-    this.save = function () {
-
-
-        var name_form = 'users' //button.attr('data-elements');
-        var i = 0//button.attr('data-id');
+    this.save = function(button) {
+        var name_form = button.attr('data-elements');
+        var i = button.attr('data-id');
         var object = this;
         if (i == undefined) {
             var i = object.data.length;
@@ -82,16 +89,18 @@ var One2More = function () {
 
     this.edit = function (id) {
         this.modal.html(this.htmlTmpl);
-        alert( $('#modal_sub_data').length )
         $('#modal_sub_data').modal('show');
         if (id != null) {
             var data = this.data[id];
+
             $('*[data-form="' + this.form + '"]').each(function (index) {
                 name = $(this).attr('data-name')
                 if (!data[name]) {
+                    //console.log(data[name]);
                     $(this).removeAttr('checked');
-                    return false;
+                    return true;
                 }
+
                 if ($(this).is(':radio') || $(this).is(':checkbox')) {
 
 
@@ -109,7 +118,6 @@ var One2More = function () {
             });
             $('#modal_sub_data').find('button[data-action="save"]').attr('data-id', id);
         } else {
-
             $('#modal_sub_data').find('button[data-action="save"]').removeAttr('data-id');
         }
 
@@ -127,22 +135,25 @@ var One2More = function () {
                 var label = this.data[i][j].label;
                 var name = this.data[i][j].name;
 
+                if ( name!=undefined ){
+                    var hidden = $('<input type="hidden" name="' + form_name + '[' + name + '][' + i + ']" value="' + value + '">');
+                    row.append(hidden);
+                }
                 if (!this.cols[name]) {
+
                     continue;
                 }
 
                 row.append('<div class="col-md-5"><strong>' + label + '</strong></div>');
                 row.append('<div class="col-md-5">' + value + '</div>');
-                var hidden = $('<input type="hidden" name="' + form_name + '[' + name + '][' + i + ']" value="' + value + '">');
-                row.append(hidden);
 
             }
             var btn = $('<div class="col-md-10" style="margin-top:10px"></div>').
                 append(
                     $('<div class="btn-group"></div>').append(
-                            $('<button type="button" class="btn btn-danger" data-id="' + i + '" data-action="delete" ">Удалить</button>').data('data-object', this)
+                            $('<button type="button" class="btn btn-danger" data-id="' + i + '" data-action="delete">Удалить</button>').data('data-object', this)
                         ).append(
-                            $('<button type="button" class="btn btn-danger" data-id="' + i + '" data-action="edit" ">Изменить</button>').data('data-object', this)
+                            $('<button type="button" class="btn btn-danger" data-id="' + i + '" data-action="edit">Изменить</button>').data('data-object', this)
                         )
                 );
             row.append(btn);

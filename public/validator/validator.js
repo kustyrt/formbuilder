@@ -20,10 +20,19 @@ Validator = function (id) {
 
     Validator.prototype.registerCheck4From = function () {
         var validator = this;
-        $('#' + id).find('*[required]').each(function(){
+        $('#' + id).find('*[data-required]').each(function(){
             var name = $(this).attr('name');
-            var error = $(this).attr('data-error');
-            validator.registerCheck(name,{func:'checkEmpty',onlyTrue:false,msg:error});
+            var error = $(this).attr('data-error-msg');
+            var rules_string = $(this).attr('data-required');
+            var rules = rules_string.split('|');
+            for( i in rules ){
+                if ( rules[i]=='email' ){
+                    validator.registerCheck(name,{func:'checkEmail',onlyTrue:false,msg:error});
+                }
+                if ( rules[i]=='required' ){
+                    validator.registerCheck(name,{func:'checkEmpty',onlyTrue:false,msg:error});
+                }
+            }
             /*
             if ( $(this).is('select') ){
                 validator.registerCheck(name,'checkZero');
@@ -118,7 +127,7 @@ Validator = function (id) {
                 }
             }
         }
-        console.log(count_error);
+        //console.log(count_error);
 
         if (count_error > 0) {
             return false;
@@ -262,10 +271,9 @@ Validator = function (id) {
 
     Validator.prototype.__fireError = function(element,msg){
         if ( false!==msg ){
-            element.attr('data-toggle','tooltip').attr('data-placement',"right").attr('data-original-title',msg).attr('data-trigger','manual')
+            element.attr('data-toggle','tooltip').attr('data-placement',"right").attr('data-original-title',msg).attr('data-trigger','focus')
         }
         element.tooltip('show')
-        console.log()
         element.parent('div.control-group').addClass('has-error');
         //console.log(msg);
     }

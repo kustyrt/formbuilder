@@ -64,27 +64,37 @@ class Response{
             $model = $this->builder->model;
             $model = $model::find($id);
         }else{
-            $model = new $this->builder->model;
+           // $model = new $this->builder->model;
         }
 
+        $result=[];
         foreach( $fields as $area ){
+
             foreach( $area['fields'] as $name=>$config ){
+                //\Log::info( ($config) );
+
                 $config=$config['config'];
                 $name = $config['name']=preg_replace('#\[\]#','',$config['name']);
 
                 if ( empty($name) ){
                     continue;
                 }
+
                 if ( isset($config['data']['method']) ){
-                    $object = new $this->builder->model;
+                    if ( !isset($config['data']['class']) ){
+                        $object = new $this->builder->model;
+                    }else{
+                        //\Log::info($config['data']['class']);
+                        $object = new $config['data']['class'];
+
+                    }
                     $f = $object->$config['data']['method']();
+
                     //  пропускаем
                     if (  $f instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany  ){
-
                         continue;
                     }
                     if (  $f instanceof \Illuminate\Database\Eloquent\Relations\HasMany  ){
-
                         continue;
                     }
                 }
@@ -106,17 +116,24 @@ class Response{
                         $object->move($destination_path, $file_name);
                         $names=$file_name;
                     }
-                    $model->$name = $names;
-
+                    //$model->$name = $names;
+                    $result[$name]=$names;
                 }else{
 
-                    $model->$name = $this->findResponseData4Key($name);
+                    //$model->$name = $this->findResponseData4Key($name);
+                    $result[$name]=$this->findResponseData4Key($name);
+
                 }
             }
         }
 
-
-        $model->save();
+        //\Log::info($result);
+        if ( is_null($model) ){
+            $model = $this->builder->model;
+            $model = $model::create($result);
+        }else{
+            $model->update($result);
+        }
 
         $id = $model-> getKey();
 
@@ -161,26 +178,26 @@ class Response{
 
                     $key = $f->getPlainForeignKey();
                     $model = $f->getRelated();
-
+                    $class_name = get_class($model);
 
                     $rows = $this->findResponseData4Key($name);
-                    $model::where($key,$id)->delete();
+                    $o = $class_name::where($key,$id)->get();
+                    foreach( $o as $obj ){
+                        $obj->delete();
+                    }
 
 
                     $inc=[];
                     if ( is_array($rows) ){
-                        $i=0;
-
-                        //$inc[][$key]=$id;
                         foreach($rows as $v=>$values) {
                             foreach( $values as $i=>$value ){
                                 $inc[$i][$v]=$value ;
                                 $inc[$i][$key]=$id ;
-
                             }
                         }
+
                         foreach( $inc as $array ){
-                            $model::insert($array);
+                            $class_name::create($array);
                         }
                     }
                 }

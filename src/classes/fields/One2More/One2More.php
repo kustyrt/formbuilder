@@ -8,53 +8,28 @@ class One2More extends \Nifus\FormBuilder\Fields{
     public function __construct($typeField,$name='', array $config,$builder){
         parent::__construct($typeField,$name, $config,$builder);
         \Nifus\FormBuilder\Render::jsAdd('One2More','One2More');
-
     }
 
-    static function delete(){
-        $class = \Input::get('class');
-        $method = \Input::get('method');
-        $id = \Input::get('id');
-        $instance = new $class;
-        $relation = $instance->$method();
-        $model = $relation->getRelated();
-        $delete_object = $model::find($id);
-        if ( !is_null($delete_object) ){
-            $delete_object->delete();
-        }
-        return \Response::json(['message'=>'ok']);
-    }
 
-    static function edit(){
-        $class = \Input::get('class');
-        $method = \Input::get('method');
-        $id = \Input::get('id');
-        $fields = explode(',',\Input::get('fields'));
-        $instance = new $class;
-        $relation = $instance->$method();
-        $model = $relation->getRelated();
-        $edit_object = $model::find($id);
-        $result = [];
-        if ( !is_null($edit_object) ){
-            foreach( $fields as $field ){
-                $result[$field]=$edit_object->$field;
-            }
-        }
-        return \Response::json($result);
-    }
 
     public function setValues($values){
         $this->config['values']=$values;
         return $this;
     }
 
+    public function setClass($class)
+    {
+        $this->config['data']['class'] = $class;
+        return $this;
+    }
+
     public function setFields($fields){
+
         $this->config['fields'] = $fields;
         return $this;
     }
 
     public function renderWithOutForm($response){
-
         $rows = $this->__getData();
         $v = \View::make('formbuilder::classes/fields/One2More/js')
             ->with('cols',  json_encode($this->config['values']) )
@@ -82,7 +57,7 @@ class One2More extends \Nifus\FormBuilder\Fields{
                 <div class="modal-body"><div class="row">'.$form.'</div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
-                      <button type="submit" class="btn btn-primary" data-action="save" data-elements="'.$this->config['name'].'">Сохранить</button>
+                      <button type="button" class="btn btn-primary" data-action="save" data-elements="'.$this->config['name'].'">Сохранить</button>
                     </div>
                 </div>
                 </form>
@@ -92,8 +67,6 @@ class One2More extends \Nifus\FormBuilder\Fields{
     }
 
     public function renderElement($response){
-
-
         return '
             <div><div class="container" id="container_'.$this->config['name'].'"></div></div>
             <button type="button" class="btn btn-primary" data-action="create" data-form="'.$this->config['name'].'">Добавить</button>
@@ -109,12 +82,14 @@ class One2More extends \Nifus\FormBuilder\Fields{
         if ( $id>0 ){
             $instance = $model::find($id);
             $result = $instance->$method()->get();
-            $values = $this->config['values'];
+            $values = $this->config['fields'];
             $i=0;
+
             foreach( $result as $row ){
                 $j=0;
-                foreach( $values as $key=>$label ){
-                    $rows[$i][$j] = ['value'=>$row->$key,'name'=>$key,'label'=>$label];
+                foreach( $values as $object ){
+                    $key = $object->name;
+                    $rows[$i][$key] = ['value'=>$row->$key,'name'=>$key,'label'=>$object->label];
                     $j++;
                 }
                 $i++;

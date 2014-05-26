@@ -25,7 +25,7 @@ class Validator extends Extension
 
     public function configField($config)
     {
-        /*$result = '';
+        $result = '';
         if (!isset($config['data-required'])) {
             return [];
         }
@@ -38,8 +38,8 @@ class Validator extends Extension
             }elseif(preg_match('#^email$#iUs',$t,$search) ){
                 $result .= 'email,';
             }
-        }*/
-        return [];
+        }
+        return ['required'=>$result];
 
     }
 }
