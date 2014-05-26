@@ -4,9 +4,11 @@ namespace Nifus\FormBuilder\Fields;
 
 class Select extends \Nifus\FormBuilder\Fields{
 
-    protected $config=[
-        'data'=>[]
-    ];
+    protected
+        $config=[
+            'disabled'=>[],
+            'data'=>[]
+        ];
 
     public function setOrder($key,$sort){
         $order = isset($this->config['data']['order_rules']) ? $this->config['data']['order_rules'] : [];
@@ -22,14 +24,12 @@ class Select extends \Nifus\FormBuilder\Fields{
             }
         }
         return $this;
-
     }
 
 
 
     public function setMethod($method,$closure=null)
     {
-
         $this->config['data']['method'] = $method;
         $this->config['data']['closure'] = $closure;
         $this->config['data']['type'] = 'model';
@@ -40,6 +40,13 @@ class Select extends \Nifus\FormBuilder\Fields{
         $this->config['data']['default'] = ['value'=>$title,'key'=>$key,'add'=>$add];
         return $this;
     }
+
+    public function setDisabled($disabled)
+    {
+        $this->config['disabled'] = $disabled;
+        return $this;
+    }
+
     public function setSize($size)
     {
         $this->config['data']['size'] = $size;
@@ -71,6 +78,7 @@ class Select extends \Nifus\FormBuilder\Fields{
 
 
     public function renderElement($response){
+
         //\Log::info($response->getData($this->config['name']));
         $attrs = $this->renderAttrs();
         $data = $this->selectDataFormat( $response->getData($this->config['name']) );
@@ -123,7 +131,6 @@ class Select extends \Nifus\FormBuilder\Fields{
         }
         switch($config['type']){
             case('value'):
-
                 $data .= $this->generateOptionsValue($config['options'],$select);
                 break;
             case('key_value'):
@@ -137,18 +144,22 @@ class Select extends \Nifus\FormBuilder\Fields{
     }
 
     private function generateOptionsKeyValue(array $data,array $select){
+        $disabled_values = $this->config['disabled'];
+
         $html = '';
         foreach($data as $key=>$value ){
             if ( is_array($value) ){
                 $html.='<optgroup  label="'.htmlspecialchars($key).'">';
                 foreach($value as $key2=>$value2 ){
                     $selected = in_array($key2,$select) ? 'selected="selected"' : '';
-                    $html.='<option '.$selected.' value="'.htmlspecialchars($key2).'">'.htmlspecialchars($value2).'</option>';
+                    $disabled = in_array($key,$disabled_values) ? 'disabled="disabled"' : '';
+                    $html.='<option '.$disabled.'  '.$selected.' value="'.htmlspecialchars($key2).'">'.htmlspecialchars($value2).'</option>';
                 }
                 $html.='</optgroup>';
             }else{
                 $selected = in_array($key,$select) ? 'selected="selected"' : '';
-                $html.='<option '.$selected.' value="'.htmlspecialchars($key).'">'.htmlspecialchars($value).'</option>';
+                $disabled = in_array($key,$disabled_values) ? 'disabled="disabled"' : '';
+                $html.='<option '.$disabled.' '.$selected.' value="'.htmlspecialchars($key).'">'.htmlspecialchars($value).'</option>';
             }
         }
         return $html;
@@ -156,17 +167,20 @@ class Select extends \Nifus\FormBuilder\Fields{
 
     private function generateOptionsValue(array $data,array $select){
         $html = '';
+        $disabled_values = $this->config['disabled'];
         foreach($data as $key=>$value ){
             if ( is_array($value) ){
                 $html.='<optgroup  label="'.htmlspecialchars($key).'">';
                 foreach($value as $key2=>$value2 ){
                     $selected = in_array($key2,$select) ? 'selected="selected"' : '';
-                    $html.='<option '.$selected.' value="'.htmlspecialchars($value2).'">'.htmlspecialchars($value2).'</option>';
+                    $disabled = in_array($key2,$disabled_values) ? 'disabled="disabled"' : '';
+                    $html.='<option '. $disabled .' '.$selected.' value="'.htmlspecialchars($value2).'">'.htmlspecialchars($value2).'</option>';
                 }
                 $html.='</optgroup>';
             }else{
+                $disabled = in_array($key,$disabled_values) ? 'disabled="disabled"' : '';
                 $selected = in_array($key,$select) ? 'selected="selected"' : '';
-                $html.='<option '.$selected.' value="'.htmlspecialchars($value).'">'.htmlspecialchars($value).'</option>';
+                $html.='<option '. $disabled .' '.$selected.' value="'.htmlspecialchars($value).'">'.htmlspecialchars($value).'</option>';
             }
         }
         return $html;
@@ -192,6 +206,7 @@ class Select extends \Nifus\FormBuilder\Fields{
 
 
     private function generateOptionsModelBelongsTo($object,$select){
+        $disabled_values = $this->config['disabled'];
         $config = $this->config['data'];
         $values = [];
         if ( isset($config['value']) ){
@@ -241,13 +256,14 @@ class Select extends \Nifus\FormBuilder\Fields{
 
                 $value = str_replace('{'.$sqlValue.'}',$item->$sqlValue,$value);
             }
-            $html.='<option '.$selected.' value="'.htmlspecialchars($item->$mainKey).'">'.htmlspecialchars($value).'</option>';
+            $disabled = in_array($item->$mainKey,$disabled_values) ? 'disabled="disabled"' : '';
+            $html.='<option '.$disabled.' '.$selected.' value="'.htmlspecialchars($item->$mainKey).'">'.htmlspecialchars($value).'</option>';
         }
         return $html;
     }
 
     private function generateOptionsModelBelongsToMany($object,$select){
-
+        $disabled_values = $this->config['disabled'];
         $config = $this->config['data'];
         $html = '';
         //  получаем модель связанную
@@ -289,7 +305,8 @@ class Select extends \Nifus\FormBuilder\Fields{
                     foreach($values as $sqlValue ){
                         $value = str_replace('{'.$sqlValue.'}',$sub->$sqlValue,$value);
                     }
-                    $html.='<option '.$selected.' value="'.htmlspecialchars($sub->$key).'">'.htmlspecialchars($value).'</option>';
+                    $disabled = in_array($sub->$key,$disabled_values) ? 'disabled="disabled"' : '';
+                    $html.='<option '.$disabled.' '.$selected.' value="'.htmlspecialchars($sub->$key).'">'.htmlspecialchars($value).'</option>';
                 }
                 $html.='</optgroup>';
             }
@@ -302,7 +319,9 @@ class Select extends \Nifus\FormBuilder\Fields{
                 foreach($values as $sqlValue ){
                     $value = str_replace('{'.$sqlValue.'}',$item->$sqlValue,$value);
                 }
-                $html.='<option '.$selected.' value="'.htmlspecialchars($item->$key).'">'.htmlspecialchars($value).'</option>';
+                $disabled = in_array($item->$key,$disabled_values) ? 'disabled="disabled"' : '';
+
+                $html.='<option '.$disabled.' '.$selected.' value="'.htmlspecialchars($item->$key).'">'.htmlspecialchars($value).'</option>';
             }
         }
         return $html;
