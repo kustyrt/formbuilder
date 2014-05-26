@@ -57,7 +57,7 @@ class Response{
      *
      */
     function save($fields){
-
+        $model=null;
         $data_config = $this->builder->data;
         $id = $this->findResponseData4Key( $this->builder->form_name.'_formbuilderid' );
         if ( !is_null($id) ){
@@ -65,6 +65,7 @@ class Response{
             $model = $model::find($id);
         }else{
            // $model = new $this->builder->model;
+
         }
 
         $result=[];
