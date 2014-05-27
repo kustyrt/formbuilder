@@ -12,7 +12,9 @@ class CKEditor extends \Nifus\FormBuilder\Fields\Textarea{
         \Nifus\FormBuilder\Render::jsAdd('ckeditor','CKEditor');
 
         //\Log::info();
-        $v = \View::make('formbuilder::classes/fields/CKEditor/js')->with('id',$this->config['id']);
+        $v = \View::make('formbuilder::classes/fields/CKEditor/js')
+            ->with('form',$this->builder->form_name )
+            ->with('id',$this->config['id']);
         \Nifus\FormBuilder\Render::setJs($v->render(), $v->getPath());
 
         return parent::renderElement($response);

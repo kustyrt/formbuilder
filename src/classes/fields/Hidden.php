@@ -8,6 +8,9 @@ class Hidden extends \Nifus\FormBuilder\Fields{
     {
          return ['inline'=>true];
     }
+    public function renderLabel(){
+        return false;
+    }
     public function renderElement($response){
 
         $attrs = $this->renderAttrs();
