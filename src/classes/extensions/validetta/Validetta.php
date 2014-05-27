@@ -45,6 +45,8 @@ class Validetta extends Extension
                 $result .= $search[1].'[' . $search[2] . '],';
             }elseif ( preg_match('#^customReg:(.*)$#iUs',$t,$search) ){
                 $result .= 'customReg[' . $search[1] . '],';
+            }elseif ( preg_match('#^number#iUs',$t,$search) ){
+                $result .= 'number,';
             }
         }
         return ['data-validetta' => $result];
