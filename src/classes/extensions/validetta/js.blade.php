@@ -4,12 +4,6 @@
 
     $(document).ready(function() {
         $("#{{$formName}}").validetta({
-            customReg : {
-                select : {
-                    method :  /^[^0]$/,
-                    errorMessage : 'Пожалуйста выберите'
-                }
-            },
             realTime     : true,
             conditional : {
                 visible : function() {

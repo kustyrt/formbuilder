@@ -143,6 +143,9 @@ class FormBuilder
             $name = $config['name'];
             $type = $config['type'];
             $config = $config['config'];
+            if ( empty($name) ){
+                $name = $type.rand(1,10000).time();
+            }
             if ( !empty($name) && isset($fields_config[$name]) ){
                 throw new ConfigException(' name:' . $name.' уже было определено ранее');
             }
