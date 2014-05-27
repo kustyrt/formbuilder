@@ -5,23 +5,25 @@
             this.source = $('#'+form).find('*[data-source]');
             this.receiver = $('#'+form).find('*[name='+this.source.attr('data-receiver')+']');
 
-            $('body').on('change',this.source.attr('id'),function()
+            $('body').on('change','#'+this.source.attr('id'),function()
             {
 
                 Chain.receiver.attr('disabled','disabled');
                 var id = Chain.source.val();
                 var url = Chain.source.attr('data-url');
-
+                if ( id==0 ){
+                    return false;
+                }
                 $.ajax({
                     dataType: Chain.source.attr('data-format'),
-                    type: "POST",
+                    type: "post",
                     url: url,
                     data: { id: id }
                 }).done(function( data ) {
                         var select = '';
                         for (var i = 0; i < data.length; i++) {
                             select += '<option value="' + data[i].city_id + '">' +
-                                data[i].title_ru + '</option>';
+                                data[i].title + '</option>';
                         }
                         Chain.receiver.html(select);
                         Chain.receiver.removeAttr('disabled');
