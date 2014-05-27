@@ -29,18 +29,22 @@ class Validetta extends Extension
 
     public function configField($config)
     {
+
         $result = '';
         if (!isset($config['data-required'])) {
             return [];
         }
         $result .= 'required,';
         $types = explode('|', $config['data-required']);
-
         foreach ($types as $t) {
             if ( preg_match('#^(min|max):([0-9]*)$#iUs',$t,$search) ){
                 $result .= $search[1].'Length[' . $search[2] . '],';
             }elseif(preg_match('#^email$#iUs',$t,$search) ){
                 $result .= 'email,';
+            }elseif ( preg_match('#^(minSelected|maxSelected):([0-9]*)$#iUs',$t,$search) ){
+                $result .= $search[1].'[' . $search[2] . '],';
+            }elseif ( preg_match('#^customReg:(.*)$#iUs',$t,$search) ){
+                $result .= 'customReg[' . $search[1] . '],';
             }
         }
         return ['data-validetta' => $result];
