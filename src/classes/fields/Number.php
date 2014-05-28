@@ -11,6 +11,6 @@ class Number extends \Nifus\FormBuilder\Fields{
         if ( !is_null($value) ){
             $attrs.='value="'.htmlspecialchars($value).'"';
         }
-        return '<input type="number" min="0" step="1"  '.$attrs.' />';
+        return '<input type="number"  '.$attrs.' />';
     }
 }
