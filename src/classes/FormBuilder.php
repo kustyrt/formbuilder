@@ -60,9 +60,27 @@ class FormBuilder
      * @return $this
      */
     public function setRender($format,$config=[]){
+        if ( $format=='array' ){
+            $format = 'WithoutFormat';
+        }else{
+            $format = ucfirst($format);
+        }
         $config = array_merge($config,['format'=>$format]);
         return  $this->set('render',$config);
     }
+
+
+    public function setCols($cols){
+        $config = $this->render;
+        if ( is_array($config) ){
+            $config = array_merge($config,['cols'=>$cols]);
+        }else{
+            $config = ['cols'=>$cols];
+        }
+        return  $this->set('render',$config);
+    }
+
+
     public function getRender()
     {
         return new Render($this->config, $this);
@@ -95,6 +113,7 @@ class FormBuilder
         }
         return $this;
     }
+
 
     /**
      * @param $method
@@ -133,7 +152,13 @@ class FormBuilder
      * @return $this
      */
     public function setExtensions(array $extensions){
-        return $this->set('extensions',$extensions);
+        $exts =  $this->extensions;
+        if ( is_array($exts) ){
+            $exts = array_merge($extensions,$this->extensions );
+        }else{
+            $exts = $extensions;
+        }
+        return $this->set('extensions',$exts);
     }
 
     public function setFields(array $fields,$title=''){
@@ -248,16 +273,17 @@ class FormBuilder
     }
 
 
-    /**
-     * Выдаём результат
-     *
-     * @param array $fields список полей для рендинга
-     * @return array|string
-     * @throws ConfigException
-     */
+
     public function render($fields=array(),$get_object=false)
     {
-        $render = new Render($this,$this->response);
+        $render_config = $this->render;
+        $class = !isset($render_config['format']) ? 'WithoutFormat' :$render_config['format'];
+        $class = 'Nifus\FormBuilder\Render\\'.$class.'';
+        if ( !class_exists($class) ){
+            throw new ConfigException('Не найден класс '.$class);
+        }
+
+        $render = new $class($this,$this->response);
         $render->setFields($this->fields);
         if ( false===$get_object ){
         return $render->render($fields);

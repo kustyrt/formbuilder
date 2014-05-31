@@ -18,7 +18,7 @@ class Render
         $assetCss = [],
         $staticJs = '';
 
-    private
+    protected
         $withOutForm='',
         $fields,
         $builder,
@@ -92,55 +92,7 @@ class Render
         return $this->cssRender() .$this->jsRender();
     }
 
-    function render($fields = array())
-    {
-        $render_config = $this->builder->render;
-        switch ($render_config['format']) {
-            case('bootstrap3'):
-                if (sizeof($fields) > 0) {
-                    return
-                        $this->bootstrap3Render($fields);
-                } else {
-                    return
-                        $this->formRender($this->bootstrap3Render()) .
-                        $this->withOutFormRender().
-                        $this->cssRender() .
-                        $this->jsRender();
-                }
 
-                break;
-
-            case('table'):
-                return
-                    $this->formRender($this->tableRender()) .
-                    $this->cssRender() .
-                    $this->jsRender();
-                break;
-            case('ul'):
-                break;
-            case('p'):
-                if (sizeof($fields) > 0) {
-                    return
-                        $this->paragrafRender($fields);
-                } else {
-                    return
-                        $this->formRender($this->paragrafRender()) .
-                        $this->cssRender() .
-                        $this->jsRender();
-                }
-
-                break;
-            case('dev'):
-                break;
-            case('array'):
-                $view = new RenderView($this->arrayRender(), $this->jsRender(), $this->cssRender(), $this->errors());
-                return $view;
-                break;
-            default:
-                throw new ConfigException(' Неправильный формат вывода ' . $render_config['format']);
-                break;
-        }
-    }
 
 
 
@@ -231,63 +183,7 @@ class Render
         return $result;
     }
 
-    protected function tableRender()
-    {
-        $table = $this->setLine('<table class="formBuilder">');
-        foreach ($this->fields as $name => $config) {
-            $type = $config['type'];
-            $config = $config['config'];
-            $elementRender = $this->elementRender($name, $config,$type);
-            $table .= $this->setLine('<tr class="' . $name . '">');
-            $table .= $this->setLine('<td>');
-            $table .= $this->setLine($elementRender['label'] . '');
-            $table .= $this->setLine('</td>');
-            $table .= $this->setLine('<td>');
-            $table .= $this->setLine($elementRender['element']);
-            $table .= $this->setLine('</td>');
-            $table .= $this->setLine('</tr>');
-        }
-        $table .= $this->setLine('<tr>');
-        $table .= $this->setLine('<td colspan="2"><input type="submit" /></td>');
-        $table .= $this->setLine('</tr>');
-        $table .= $this->setLine('</table>');
 
-
-        return $table;
-    }
-
-    protected function paragrafRender($fields = array())
-    {
-        $show_label = isset($this->config['render']['label']) ? $this->config['render']['label'] : true;
-        $par = '';
-        foreach ($this->fields as $name => $config) {
-            if (!in_array($name, $fields)) {
-                continue;
-            }
-            $type = $config['type'];
-            $config = $config['config'];
-            $elementRender = $this->elementRender($name, $config,$type);
-
-
-            if ( true===$show_label && (!isset($config['inline']) || false===$config['inline'])){
-                $par .= $this->setLine('<p class="' . $name . '">');
-                $par .= $this->setLine($elementRender['label'] . '');
-                $par .= $this->setLine('</p>');
-            }
-            if ( !isset($config['inline']) || false===$config['inline'] ){
-                $par .= $this->setLine('<p>');
-                $par .= $this->setLine($elementRender['element']);
-                $par .= $this->setLine('</p>');
-            }else{
-                $par .= $this->setLine($elementRender['element']);
-
-            }
-        }
-        if ( sizeof($fields)==0 ){
-            $par .= $this->setLine('<p><input type="submit" /></p>');
-        }
-        return $par;
-    }
 
     public function withOutFormRender(){
         return $this->withOutForm;
@@ -295,84 +191,9 @@ class Render
     public function setWithOutForm($html){
         $this->withOutForm .= $html;
     }
-    public function bootstrap3Render($fields = array())
-    {
-        $table = '';
-        $render_config = $this->builder->render;
-        $col = isset($render_config['grid']) ? $render_config['grid'] : 'col-md-6';
-        foreach ($this->fields as $area) {
-            if (  sizeof($this->fields)>1 ){
-                $table .= $this->setLine('<div class="panel panel-default">');
-                $table .= $this->setLine('<div class="panel-heading">');
-                $table .= $this->setLine($area['title']);
-                $table .= $this->setLine('</div>');
-            }
-            $table .= $this->setLine('<div class="panel-body">');
-            foreach( $area['fields'] as $name => $config){
-                if ( sizeof($fields)>0 && !in_array($name, $fields)) {
-                    continue;
-                }
-                $type = $config['type'];
-                $config = $config['config'];
-                $elementRender = $this->elementRender($name, $config,$type);
-
-                if ( false!==$elementRender['render_with_out_form']){
-                    $this->setWithOutForm($elementRender['render_with_out_form']);
-                }
-                if ( true === $elementRender['break_line'] ){
-                    $table .= $this->setLine('<div class="col-md-10">');
-                }else{
-                    $table .= $this->setLine('<div class="'.$col.' control-group">');
-                }
-                if ( is_array($elementRender['element']) ){
-                    // 4 checkbox &&  radio
-                    $table .= $this->setLine($elementRender['label']);
-                    $table .= $this->setLine('<div>');
-                    foreach( $elementRender['element'] as $i=>$element ){
-                        $table .= $this->setLine('<label class="checkbox-inline control-label">');
-                        $table .= $this->setLine($elementRender['element'][$i]);
-                        $table .= $this->setLine('</label>');
-                    }
-                    $table .= $this->setLine('</div>');
-                }else{
-                    if ( !is_null($elementRender['label'])){
-                    $table .= $this->setLine($elementRender['label']);
-                    }
-                    $table .= $this->setLine($elementRender['element']);
-
-                    if ( isset($elementRender['comment']) && !empty($elementRender['comment']) ){
-                        $table .= $this->setLine('<small>'.$elementRender['comment'].'</small>');
-
-                    }
-                }
-                $table .= $this->setLine('</div>');
 
 
 
-            }
-            $table .= $this->setLine('</div>');
-
-            $table .= $this->setLine('</div>');
-
-        }
-        return $table;
-    }
-
-
-    //  inline method
-
-    protected function arrayRender()
-    {
-        $elements = array();
-        foreach ($this->fields as $area) {
-            foreach( $area['fields'] as $name => $config){
-                $type = $config['type'];
-                $config = $config['config'];
-                $elements[$name] = $this->elementRender($name, $config,$type);
-            }
-        }
-        return $elements;
-    }
 
     public function setFields(array $fields ){
         $this->fields = $fields;
