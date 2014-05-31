@@ -164,7 +164,7 @@ class Fields
 
 
     protected function clear($str){
-        return strtolower(preg_replace('#[^a-z]#i','',$str));
+        return strtolower(preg_replace('#[^a-z0-9]#i','',$str));
     }
 
 

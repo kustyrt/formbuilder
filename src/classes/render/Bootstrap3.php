@@ -23,8 +23,16 @@ class Bootstrap3 extends \Nifus\FormBuilder\Render
     function bootstrap3Render($fields){
         $table = '';
         $render_config = $this->builder->render;
+        if ( isset($render_config['cols']) ){
+            if ( $render_config['cols']=='inline' ){
+                $col = 'col-md-1';
+            }else{
+                $col = 'col-md-'.round(12/$render_config['cols']);
+            }
+        }else{
+            $col = 'col-md-6';
+        }
 
-        $col = isset($render_config['grid']) ? $render_config['grid'] : 'col-md-6';
 
         foreach ($this->fields as $area)
         {

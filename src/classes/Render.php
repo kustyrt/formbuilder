@@ -11,12 +11,10 @@ namespace Nifus\FormBuilder;
 class Render
 {
     static
-        $assetJs = [
-        'jquery' => false,
-        //'engine'=>null
-    ],
+        $assetJs = [],
         $assetCss = [],
-        $staticJs = '';
+        $staticJs = '',
+        $staticCss = '';
 
     protected
         $withOutForm='',
@@ -26,18 +24,8 @@ class Render
 
     public function __construct($builder,$response)
     {
-
         $this->builder = $builder;
         $this->response = $response;
-        /*
-        if ( !isset(self::$assetJs['jquery']) ){
-            self::$assetJs['jquery'] = false;
-        }
-        self::$assetJs['jquery'] = (false === (self::$assetJs['jquery'])) && !isset($this->builder->jquery) ? false : null;
-*/
-        if (isset($this->builder->ajax)) {
-            self::jsAdd('jquery.form');
-        }
         $this->loadExtensions();
     }
 
@@ -47,28 +35,6 @@ class Render
             return false;
         }
         self::$assetJs[$file] = $ext;
-    }
-
-    /**
-     * Загружаем расширения
-     */
-    protected function loadExtensions()
-    {
-
-        if ( !is_array($this->builder->extensions)) {
-            return false;
-        }
-
-        foreach ($this->builder->extensions as $ext) {
-            $class = 'Nifus\FormBuilder\Extensions\\' . $ext;
-            if (!class_exists($class)) {
-                throw new RenderException('Не найден класс ' . $class);
-            }
-            $ext = new $class($this->builder);
-            $ext->loadAsset();
-            //$class::autoload($this);
-        }
-        return true;
     }
 
     static function cssAdd($file, $ext = null)
@@ -87,6 +53,28 @@ class Render
             self::$staticJs .= "\n\r" . "<!-- include " . $path . "--> \n\r" . $js . "\n\r";
         }
     }
+
+    /**
+     * Загружаем расширения
+     */
+    protected function loadExtensions()
+    {
+        if ( !is_array($this->builder->extensions)) {
+            return false;
+        }
+        foreach ($this->builder->extensions as $ext) {
+            $class = 'Nifus\FormBuilder\Extensions\\' . $ext;
+            if (!class_exists($class)) {
+                throw new RenderException('Не найден класс ' . $class);
+            }
+            $ext = new $class($this->builder);
+            $ext->loadAsset();
+            //$class::autoload($this);
+        }
+        return true;
+    }
+
+
 
     function renderAssets(){
         return $this->cssRender() .$this->jsRender();

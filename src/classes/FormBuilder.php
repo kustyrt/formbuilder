@@ -60,12 +60,13 @@ class FormBuilder
      * @return $this
      */
     public function setRender($format,$config=[]){
+        $render = !is_null($this->render) ? $this->render : [];
         if ( $format=='array' ){
             $format = 'WithoutFormat';
         }else{
             $format = ucfirst($format);
         }
-        $config = array_merge($config,['format'=>$format]);
+        $config = array_merge($config,['format'=>$format], $render);
         return  $this->set('render',$config);
     }
 
@@ -87,19 +88,14 @@ class FormBuilder
     }
 
     /**
-     * @param bool $flag
-     * @return $this
+     * удаление
      */
     public function setJquery($flag){
-        if ( true===$flag){
-            Render::$assetJs['jquery']=null;
-        }else{
-            Render::$assetJs['jquery']=false;
-        }
-        return $this;
+        return $this->setLibrary();
     }
 
-    public function setLibrary($libs){
+    public function setLibrary( $libs=array() ){
+        $libs = ( !is_array($libs) || sizeof($libs)==0)  ? ['jquery','bootstrap'] : $libs;
         foreach( $libs as $lib ){
             switch($lib){
                 case('bootstrap'):
