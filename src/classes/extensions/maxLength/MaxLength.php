@@ -15,7 +15,7 @@ class MaxLength extends Extension
 
     public function loadAsset()
     {
-        \Nifus\FormBuilder\Render::jsAdd('jquery');
+        //\Nifus\FormBuilder\Render::jsAdd('jquery');
         \Nifus\FormBuilder\Render::jsAdd('bootstrap-maxlength.min','MaxLength');
 
 

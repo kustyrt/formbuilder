@@ -6,7 +6,7 @@ class Mask extends Extension
 {
 
     public function loadAsset(){
-        \Nifus\FormBuilder\Render::jsAdd('jquery');
+        //\Nifus\FormBuilder\Render::jsAdd('jquery');
         \Nifus\FormBuilder\Render::jsAdd('jquery.mask.min','mask');
 
         $v = \View::make('formbuilder::classes/extensions/mask/js')

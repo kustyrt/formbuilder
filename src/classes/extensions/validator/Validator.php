@@ -10,7 +10,7 @@ class Validator extends Extension
 
     public function loadAsset()
     {
-        \Nifus\FormBuilder\Render::jsAdd('jquery');
+        //\Nifus\FormBuilder\Render::jsAdd('jquery');
 
         // валидация
         \Nifus\FormBuilder\Render::jsAdd('validator', 'validator');

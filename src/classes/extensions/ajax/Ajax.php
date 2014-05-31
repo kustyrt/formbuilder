@@ -12,7 +12,7 @@ class Ajax extends Validetta
 
     public function loadAsset()
     {
-        \Nifus\FormBuilder\Render::jsAdd('jquery');
+       // \Nifus\FormBuilder\Render::jsAdd('jquery');
         \Nifus\FormBuilder\Render::jsAdd('jquery.form','ajax');
 
         // валидация

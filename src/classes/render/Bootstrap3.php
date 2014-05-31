@@ -41,8 +41,9 @@ class Bootstrap3 extends \Nifus\FormBuilder\Render
                 $table .= $this->setLine('<div class="panel-heading">');
                 $table .= $this->setLine($area['title']);
                 $table .= $this->setLine('</div>');
+                $table .= $this->setLine('<div class="panel-body">');
+
             }
-            $table .= $this->setLine('<div class="panel-body">');
 
             foreach( $area['fields'] as $name => $config){
                 if ( sizeof($fields)>0 && !in_array($name, $fields)) {
@@ -53,42 +54,40 @@ class Bootstrap3 extends \Nifus\FormBuilder\Render
                 $elementRender = $this->elementRender($name, $config,$type);
 
 
-                if ( true === $elementRender['break_line'] ){
-                    $table .= $this->setLine('<div class="col-md-10">');
-                }else{
-                    $table .= $this->setLine('<div class="'.$col.' control-group">');
-                }
-                if ( is_array($elementRender['element']) ){
-                    // 4 checkbox &&  radio
-                    $table .= $this->setLine($elementRender['label']);
-                    $table .= $this->setLine('<div>');
-                    foreach( $elementRender['element'] as $i=>$element ){
-                        $table .= $this->setLine('<label class="checkbox-inline control-label">');
-                        $table .= $this->setLine($elementRender['element'][$i]);
-                        $table .= $this->setLine('</label>');
+                    if ( true === $elementRender['break_line'] ){
+                        $table .= $this->setLine('<div class="col-md-10">');
+                    }else{
+                        $table .= $this->setLine('<div class="'.$col.' control-group">');
                     }
+                        if ( is_array($elementRender['element']) ){
+                            // 4 checkbox &&  radio
+                            $table .= $this->setLine($elementRender['label']);
+                            $table .= $this->setLine('<div>');
+                            foreach( $elementRender['element'] as $i=>$element ){
+                                $table .= $this->setLine('<label class="checkbox-inline control-label">');
+                                $table .= $this->setLine($elementRender['element'][$i]);
+                                $table .= $this->setLine('</label>');
+                            }
+                            $table .= $this->setLine('</div>');
+                        }else{
+                            if ( !is_null($elementRender['label'])){
+                                $table .= $this->setLine($elementRender['label']);
+                            }
+                            $table .= $this->setLine($elementRender['element']);
+
+                            if ( isset($elementRender['comment']) && !empty($elementRender['comment']) ){
+                                $table .= $this->setLine('<small>'.$elementRender['comment'].'</small>');
+                            }
+                        }
                     $table .= $this->setLine('</div>');
-                }else{
-                    if ( !is_null($elementRender['label'])){
-                        $table .= $this->setLine($elementRender['label']);
-                    }
-                    $table .= $this->setLine($elementRender['element']);
-
-                    if ( isset($elementRender['comment']) && !empty($elementRender['comment']) ){
-                        $table .= $this->setLine('<small>'.$elementRender['comment'].'</small>');
-
-                    }
-                }
-                $table .= $this->setLine('</div>');
-
-
-
             }
-            $table .= $this->setLine('</div>');
-
-            $table .= $this->setLine('</div>');
-
+            if (  sizeof($this->fields)>1 ){
+                $table .= $this->setLine('</div>');
+                $table .= $this->setLine('</div>');
+            }
         }
+
+        \Log::info($table);
         return $table;
     }
 
