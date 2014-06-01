@@ -111,7 +111,6 @@ class Render
 
     protected function formRender($content)
     {
-
         $formAttrs = [
             'enctype' => $this->builder->enctype,
             'method' => $this->builder->method,

@@ -12,6 +12,7 @@ class Bootstrap3 extends \Nifus\FormBuilder\Render
             return
                 $this->bootstrap3Render($fields);
         } else {
+
             return
                 $this->formRender($this->bootstrap3Render([])) .
                 $this->withOutFormRender().
@@ -86,8 +87,6 @@ class Bootstrap3 extends \Nifus\FormBuilder\Render
                 $table .= $this->setLine('</div>');
             }
         }
-
-        \Log::info($table);
         return $table;
     }
 
