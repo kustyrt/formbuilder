@@ -79,16 +79,19 @@ class Select extends \Nifus\FormBuilder\Fields{
 
     public function renderElement($response){
 
-        //\Log::info($response->getData($this->config['name']));
         $attrs = $this->renderAttrs();
-        $data = $this->selectDataFormat( $response->getData($this->config['name']) );
+        $data = $response->getData($this->config['name']);
+        $data_select = $this->selectDataFormat( $data );
 
         $multi='';
         if ( $this->isMultiple( $this->config['data']) ){
             $size= isset( $this->config['data']['size']) ? $this->config['data']['size'] : 5;
             $multi = 'multiple="multiple" size="'.$size.'"';
+            $attrs .= ' data-value="'.implode(',',$data).'"';
+        }else{
+            $attrs .= ' data-value="'.$data.'"';
         }
-        return '<select '.$attrs.' '.$multi.'>'.$data.'</select>';
+        return '<select '.$attrs.' '.$multi.'>'.$data_select.'</select>';
     }
 
     protected function getDefaultConfig()

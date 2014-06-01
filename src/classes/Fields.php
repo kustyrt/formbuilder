@@ -54,6 +54,8 @@ class Fields
     public function setValue($value)
     {
         $this->value =  $value ;
+       // $this->set('data-value',$value);
+        \Log::info($value);
         return $this;
     }
 
@@ -122,6 +124,7 @@ class Fields
         $value = $response->getData($this->config['name']);
         if ( !is_null($value) ){
             $attrs.='value="'.htmlspecialchars($value).'"';
+            $attrs.='data-value="'.htmlspecialchars($value).'"';
         }
         return '<input type="'.$this->typeField.'" '.$attrs.' />';
     }
