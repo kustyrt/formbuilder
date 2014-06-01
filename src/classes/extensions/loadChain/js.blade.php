@@ -18,6 +18,11 @@
                     var type = $(this).attr('data-format')
                     var  receiver = form.find('*[name='+receiver_id+']');
                     Chain.ajax(type,id,receiver,url );
+                }else{
+                    console.log( $(this).attr('data-receiver'));
+                    var receiver_id= $(this).attr('data-receiver');
+                    form.find('*[name='+receiver_id+']').attr('disabled','disabled').html('');
+                    form.find('*[name='+receiver_id+']').trigger('change');
                 }
             });
 
