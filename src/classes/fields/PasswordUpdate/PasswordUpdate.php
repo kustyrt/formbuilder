@@ -10,8 +10,24 @@ class PasswordUpdate extends \Nifus\FormBuilder\Fields{
         ];
 
     public function __construct($typeField,$name='',array $config,$builder){
-        $v = \View::make('formbuilder::classes/fields/PasswordUpdate/js');
-        \Nifus\FormBuilder\Render::setJs($v->render(), $v->getPath());
+        \Nifus\FormBuilder\Render::jsAdd('password','PasswordUpdate');
+
+        parent::__construct($typeField,$name,$config,$builder);
+
+    }
+
+    public function renderElement($response){
+        if ( !$response->isCreate() ){
+            $this->config['data-value-exists']=1;
+        }
+        $attrs = $this->renderAttrs();
+
+        $elements='<input type="password"  '.$attrs.' />';
+        return $elements;
+
+
+
+
     }
 
 

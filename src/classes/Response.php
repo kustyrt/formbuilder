@@ -259,7 +259,13 @@ class Response{
     }
 
 
-
+    public  function isCreate(){
+        $id = $this->builder->getId();
+        if ( !$id ){
+            return true;
+        }
+        return false;
+    }
 
     protected function getModelData($key){
 
