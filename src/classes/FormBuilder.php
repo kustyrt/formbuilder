@@ -250,6 +250,7 @@ class FormBuilder
     }
     public function errors()
     {
+
         if ($this->config['single_error']) {
             return array_shift($this->errors);
         }

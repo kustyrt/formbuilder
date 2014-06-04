@@ -47,11 +47,11 @@
                 'type': 'post',
                 'success': function (json) {
                 if (json && json.error) {
-                        $('#{{$formName}}Message').html(json.error).show().removeClass('hide');
+                        $('#{{$formName}}Message').html(json.error).show().removeClass('hide').addClass('alert-danger').addClass('alert-success');
                         $('#{{$formName}} [name=' + json.field + ']').focus();
                     } else if (json && json.msg) {
-                        $('#{{$formName}}Message').html(json.msg).show().removeClass('hide');
-                    } else if (json && json.url) {
+                        $('#{{$formName}}Message').html(json.msg).show().removeClass('hide').addClass('alert-success').addClass('alert-danger');
+                } else if (json && json.url) {
                        window.location = json.url;
                     } else {
                         window.location.reload(true);

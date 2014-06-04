@@ -15,7 +15,7 @@ class Response{
      */
     public function fails($fields)
     {
-        $rules = $data_config = $errors_msg=[];
+        $rules = $data_config = $errors_msg=$labels= [];
 
         foreach( $fields as $area )
         {
@@ -27,7 +27,7 @@ class Response{
                 if ( isset($config['data-error-msg']) ){
                     $errors_msg[$name]=$config['data-error-msg'];
                 }
-
+                $labels[$name]=$config['label'];
                 $rules[$name][]='required';
                 $parameters = explode(',',$config['data-required']);
                 foreach( $parameters as $parametr ){
@@ -36,6 +36,7 @@ class Response{
                 $data_config[$name] = $this->findResponseData4Key($name);
             }
         }
+
         $check = \Validator::make(
             $data_config,
             $rules
@@ -45,11 +46,15 @@ class Response{
             return false;
         }
         $errors = $check->failed();
+        $messages = $check->messages();
+
         foreach( $errors as $key=>$info){
-            $msg = isset($errors_msg[$key]) ?  $errors_msg[$key] : $key;
+            $system_msg =  $messages->first($key);
+            $system_msg = preg_replace('#'.$key.'#iUs',$labels[$key],$system_msg);
+            $msg = isset($errors_msg[$key]) ?  $errors_msg[$key] :$system_msg;
+
             $this->builder->setError($msg);
         }
-
         return true;
     }
 
@@ -70,13 +75,9 @@ class Response{
 
         $result=[];
         foreach( $fields as $area ){
-
             foreach( $area['fields'] as $name=>$config ){
-                //\Log::info( ($config) );
-
                 $config=$config['config'];
                 $name = $config['name']=preg_replace('#\[\]#','',$config['name']);
-
                 if ( empty($name) ){
                     continue;
                 }
@@ -117,18 +118,12 @@ class Response{
                         $object->move($destination_path, $file_name);
                         $names=$file_name;
                     }
-                    //$model->$name = $names;
                     $result[$name]=$names;
                 }else{
-
-                    //$model->$name = $this->findResponseData4Key($name);
                     $result[$name]=$this->findResponseData4Key($name);
-
                 }
             }
         }
-
-        //\Log::info($result);
         if ( is_null($model) ){
             $model = $this->builder->model;
             $model = $model::create($result);

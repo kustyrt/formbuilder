@@ -41,10 +41,10 @@ class One2More extends \Nifus\FormBuilder\Fields{
         $names = $this->getNamesFields();
 
         $fields = $this->config['fields'];
-        $this->config['form']= \Nifus\FormBuilder\FormBuilder::create($this->config['name'])->setRender('array')
+        $this->config['form']= \Nifus\FormBuilder\FormBuilder::create($this->config['name'])->setRender('bootstrap3')
             ->setFields($fields);
-        $render_views = $this->config['form']->render($fields,true);
-        $form = ($render_views->bootstrap3Render($names));
+        $form = $this->config['form']->render();
+        // = ($render_views->bootstrap3Render($names));
 
         return '<div  class="modal fade" id="modal_sub_data" role="dialog" aria-hidden="true" tabindex="-1"  >
             <div class="modal-dialog" id="modal_'.$this->config['name'].'">
