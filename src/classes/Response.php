@@ -103,6 +103,20 @@ class Response{
 
                 if( isset($config['upload']) && true===$config['upload'] && \Input::hasFile($config['name']) ){
                     $result[$name]=$this->uploadFiles($config);
+                    if ( is_array($result[$name]) ){
+                        foreach($result[$name] as $file ){
+                            if ( isset($config['width']) && isset($config['height']) ){
+                                $destination_path =  public_path().'/'.$config['data-path'];
+                                $this->resizeImage($destination_path.'/'.$file,$config['width'],$config['height']);
+                            }
+                        }
+                    }elseif( !empty($result[$name]) ){
+                        if ( isset($config['width']) && isset($config['height']) ){
+                            $destination_path =  public_path().'/'.$config['data-path'];
+                            $this->resizeImage($destination_path.'/'.$result[$name],$config['width'],$config['height']);
+                        }
+                    }
+
                 }else{
                     $result[$name]=$this->findResponseData4Key($name);
                 }
@@ -186,24 +200,86 @@ class Response{
         return true;
     }
 
-    public function uploadFiles($config){
-//  загрузка файла
+    private function resizeImage($file,$width,$height){
+        $file = \Image::make($file);
+        if ( is_null($file) ){
+            return false;
+        }
+        $height_source = $file->height();
+        $width_source = $file->width();
+
+        $min = min($width_source,$height_source);
+
+
+        $koof = $min/$width;
+        $small_w = round($width_source / $koof);
+        $small_h = round($height_source / $koof);
+
+
+        if ( $small_w<$small_h ){
+            $padding = round(($small_h - $height)/2);
+            $file->resize($small_w,$small_h)
+                ->crop($width,$height,0,intval($padding))
+                ->save();
+        }elseif($small_w>$small_h){
+            $padding = round(($small_w - $width)/2);
+            $file->resize($small_w,$small_h)
+                ->crop( ($width),$height,intval($padding),0)
+                ->save();
+        }else{
+            $file->resize($small_w,$small_h)->save();
+        }
+    }
+
+    private function uploadFiles($config){
         $object = \Input::file($config['name']);
 
         $destination_path =  public_path().'/'.$config['data-path'];
         $names = [];
         if ( is_array($object) ){
             foreach( $object as $file ){
-
-                $file_name = $file->getClientOriginalName();
+                if ( isset($config['origin_name']) ){
+                    $file_name = $file->getClientOriginalName();
+                }else{
+                    $file_name = $this->unicName($destination_path,$file->getClientOriginalExtension());
+                }
+                if ( isset($config['exts']) && !in_array($file->getClientOriginalExtension(),$config['exts']) ){
+                    continue;
+                }
                 $file->move($destination_path, $file_name);
                 $names[]=$file_name;
             }
         }else{
-            $file_name = $object->getClientOriginalName();
-            $object->move($destination_path, $file_name);
-            $names=$file_name;
+            if ( isset($config['origin_name']) ){
+                $file_name = $object->getClientOriginalName();
+            }else{
+                $file_name = $this->unicName($destination_path,$object->getClientOriginalExtension());
+            }
+            if ( isset($config['exts']) && in_array($object->getClientOriginalExtension(),$config['exts']) ){
+                $object->move($destination_path, $file_name);
+                $names=$file_name;
+            }else{
+                $names=null;
+            }
+
         }
+
+
+        return $names;
+    }
+
+    private function unicName($path,$ext=''){
+            $base = time();
+            while(2<3)
+            {
+                $new = (isset($ext)) ? $path.'/'.$base.'.'.$ext : $path.'/'.$base;
+                if ( !file_exists($new) )
+                {
+                    break;
+                }
+                $base++;
+            }
+            return (isset($ext)) ? $base.'.'.$ext : $base;
     }
 
     /**
