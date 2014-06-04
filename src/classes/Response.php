@@ -102,23 +102,7 @@ class Response{
                 }
 
                 if( isset($config['upload']) && true===$config['upload'] && \Input::hasFile($config['name']) ){
-                    //  загрузка файла
-                    $object = \Input::file($config['name']);
-
-                    $destination_path =  public_path().'/'.$config['data-path'];
-                    $names = [];
-                    if ( is_array($object) ){
-                        foreach( $object as $file ){
-                            $file_name = $file->getClientOriginalName();
-                            $file->move($destination_path, $file_name);
-                            $names[]=$file_name;
-                        }
-                    }else{
-                        $file_name = $object->getClientOriginalName();
-                        $object->move($destination_path, $file_name);
-                        $names=$file_name;
-                    }
-                    $result[$name]=$names;
+                    $result[$name]=$this->uploadFiles($config);
                 }else{
                     $result[$name]=$this->findResponseData4Key($name);
                 }
@@ -152,7 +136,7 @@ class Response{
                         }
                         foreach( $inc as $id_model=>$keys ){
                             $f = $model::find($id_model);
-                        $f->$config['data']['method']()->sync([]);
+                            $f->$config['data']['method']()->sync([]);
                             $f->$config['data']['method']()->sync($keys);
                         }
                     }
@@ -202,6 +186,25 @@ class Response{
         return true;
     }
 
+    public function uploadFiles($config){
+//  загрузка файла
+        $object = \Input::file($config['name']);
+
+        $destination_path =  public_path().'/'.$config['data-path'];
+        $names = [];
+        if ( is_array($object) ){
+            foreach( $object as $file ){
+
+                $file_name = $file->getClientOriginalName();
+                $file->move($destination_path, $file_name);
+                $names[]=$file_name;
+            }
+        }else{
+            $file_name = $object->getClientOriginalName();
+            $object->move($destination_path, $file_name);
+            $names=$file_name;
+        }
+    }
 
     /**
      * Возвращаем данные переданные формой

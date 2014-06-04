@@ -30,14 +30,17 @@ class File extends \Nifus\FormBuilder\Fields{
         return $elements;
     }
 
-    public function setExts()
+    public function setExts($exts)
     {
-
+        $this->config['exts'] = $exts;
+        return $this;
     }
 
-    public function setSize()
+    public function setSize($width,$height)
     {
-
+        $this->config['width'] = $width;
+        $this->config['height'] = $height;
+        return $this;
     }
 
     public function setMultiple()
