@@ -21,6 +21,10 @@ class Fields
         $this->typeField=$typeField;
     }
 
+    public function getType(){
+        return $this->typeField;
+    }
+
     public function setValid($rules='',$msg=null){
         $rules = (is_array($rules)) ? implode('|',$rules) :  $rules ;
         $this->set('data-required',$rules);

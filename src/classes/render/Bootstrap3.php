@@ -58,7 +58,13 @@ class Bootstrap3 extends \Nifus\FormBuilder\Render
                     if ( true === $elementRender['break_line'] ){
                         $table .= $this->setLine('<div class="col-md-10">');
                     }else{
-                        $table .= $this->setLine('<div class="'.$col.' control-group">');
+                        if ( $elementRender['field_type']!='checkbox') {
+                            $table .= $this->setLine('<div class="'.$col.' control-group">');
+                        }else{
+                            $table .= $this->setLine('<div class="'.$col.' control-group checkbox">');
+
+                        }
+
                     }
                         if ( is_array($elementRender['element']) ){
                             // 4 checkbox &&  radio

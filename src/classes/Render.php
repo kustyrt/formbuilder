@@ -103,7 +103,14 @@ class Render
             throw new RenderException('Не найден класс ' . $class);
         }
         $element = new $class($type,$name, $config,$this->builder);
-        return ['label' => $element->renderLabel(), 'element' => $element->renderElement($this->response),'comment'=>$element->comment,'break_line'=>$element->breakLine,'render_with_out_form'=>$element->renderWithOutForm($this->response)];
+        return [
+            'label' => $element->renderLabel(),
+            'element' => $element->renderElement($this->response),
+            'comment'=>$element->comment,
+            'break_line'=>$element->breakLine,
+            'render_with_out_form'=>$element->renderWithOutForm($this->response),
+            'field_type'=>$element->getType()
+        ];
     }
 
 

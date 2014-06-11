@@ -36,16 +36,27 @@ class Checkbox extends \Nifus\FormBuilder\Fields{
         $data = $response->getData($this->config['name']);
         $data = is_null($data ) ? ( isset($this->config['data']['default']) ? $this->config['data']['default'] : '' ) : $data;
         $elements = [];
-        foreach( $this->config['data']['options'] as $key=>$value ){
-            $checked = ($key==$data) ? 'checked="checked"' : '';
-            $elements[]='<input type="checkbox" '.$attrs.' '.$checked.' value='.$key.' />&nbsp;'.$value.'';
+        if ( isset( $this->config['data']['options']) ){
+            foreach( $this->config['data']['options'] as $key=>$value ){
+                $checked = ($key==$data) ? 'checked="checked"' : '';
+                $elements[]='<input type="checkbox" '.$attrs.' '.$checked.' value='.$key.' />&nbsp;'.$value.'';
+            }
+        }else{
+
+            $checked = ( !empty($data) ) ? 'checked="checked"' : '';
+            $elements[]='<label><input type="checkbox" '.$attrs.' '.$checked.' value="1" /> &nbsp; '.$this->config['label'].'</label>&nbsp;';
+
         }
         if ( sizeof($elements)==1 ){
             return implode('',$elements);
         }
         return $elements;
+
     }
 
+    public function renderLabel(){
+        return false;
+    }
 
 
 
