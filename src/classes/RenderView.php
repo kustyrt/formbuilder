@@ -35,8 +35,6 @@ class RenderView{
     }
 
     public function error(){
-        \Log::info( $this->errors );
-
         if ( sizeof($this->errors)==0 ){
             return null;
         }
