@@ -98,6 +98,7 @@ class Render
      */
     protected function elementRender($name, $config,$type)
     {
+        \Log::info('Nifus\FormBuilder\Fields\\' . ucfirst($type));
         $class = 'Nifus\FormBuilder\Fields\\' . ucfirst($type);
         if (!class_exists($class)) {
             throw new RenderException('Не найден класс ' . $class);
