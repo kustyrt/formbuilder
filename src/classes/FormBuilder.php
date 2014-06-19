@@ -248,9 +248,14 @@ class FormBuilder
     public function fails(){
         return $this->response->fails($this->fields);
     }
+
+    public function error()
+    {
+        return array_shift($this->errors);
+    }
+
     public function errors()
     {
-
         if ($this->config['single_error']) {
             return array_shift($this->errors);
         }

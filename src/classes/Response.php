@@ -2,6 +2,8 @@
 
 namespace Nifus\FormBuilder;
 
+use Whoops\Example\Exception;
+
 class Response{
 
     private  $builder,$model=false;
@@ -72,7 +74,7 @@ class Response{
            // $model = new $this->builder->model;
 
         }
-
+        try{
         $result=[];
         foreach( $fields as $area ){
             foreach( $area['fields'] as $name=>$config ){
@@ -197,7 +199,11 @@ class Response{
                 }
             }
         }
-        return true;
+        }catch ( \Exception $e ){
+            $this->builder->setError( $e->getMessage()  );
+            return false;
+        }
+        return $model;
     }
 
     private function resizeImage($file,$width,$height){
