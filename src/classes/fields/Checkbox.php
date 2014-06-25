@@ -25,7 +25,7 @@ class Checkbox extends \Nifus\FormBuilder\Fields{
     protected function renderAttrs(){
         $attrs = '';
         foreach($this->config as $k=>$v ){
-            if ( !is_null($v) && !in_array($k,['data','id']) ){
+            if ( !is_null($v) && !in_array($k,['data']) ){
                 $attrs.=$k.'="'.$v.'" ';
             }
         }
