@@ -88,9 +88,7 @@ class Response{
                     if ( !isset($config['data']['class']) ){
                         $object = new $this->builder->model;
                     }else{
-                        //\Log::info($config['data']['class']);
                         $object = new $config['data']['class'];
-
                     }
                     $f = $object->$config['data']['method']();
 
@@ -102,7 +100,6 @@ class Response{
                         continue;
                     }
                 }
-
                 if( isset($config['upload']) && true===$config['upload'] && \Input::hasFile($config['name']) ){
                     $result[$name]=$this->uploadFiles($config);
                     if ( is_array($result[$name]) ){
@@ -117,9 +114,13 @@ class Response{
                             $destination_path =  public_path().'/'.$config['data-path'];
                             $this->resizeImage($destination_path.'/'.$result[$name],$config['width'],$config['height']);
                         }
+                    }else{
+
+
+                        throw new \Exception('Неудалось загрузить файлы');
                     }
 
-                }else{
+                }elseif( !isset($config['upload']) ){
                     $result[$name]=$this->findResponseData4Key($name);
                 }
             }
@@ -201,6 +202,7 @@ class Response{
         }
         }catch ( \Exception $e ){
             $this->builder->setError( $e->getMessage()  );
+            \Log::info($e);
             return false;
         }
         return $model;
@@ -261,13 +263,17 @@ class Response{
             }else{
                 $file_name = $this->unicName($destination_path,$object->getClientOriginalExtension());
             }
-            if ( isset($config['exts']) && in_array($object->getClientOriginalExtension(),$config['exts']) ){
+            if ( isset($config['exts'])  ){
+                if ( in_array($object->getClientOriginalExtension(),$config['exts']) ){
+                    $object->move($destination_path, $file_name);
+                    $names=$file_name;
+                }else{
+                    $names=null;
+                }
+            }else{
                 $object->move($destination_path, $file_name);
                 $names=$file_name;
-            }else{
-                $names=null;
             }
-
         }
 
 

@@ -5,7 +5,8 @@ namespace Nifus\FormBuilder\Fields;
 class File extends \Nifus\FormBuilder\Fields{
 
     protected $config=[
-        'upload'=>true
+        'upload'=>true,
+        'data-count-files'=>0
     ];
 
     static function delete(){
@@ -26,14 +27,27 @@ class File extends \Nifus\FormBuilder\Fields{
         $files = $response->getData($this->config['name']);
 
         if ( is_array($files) ){
+            $elements.='
+                <div class="row">';
             foreach( $files as $file ){
-                $elements.='<br/><a target="_blank" href="'.$url.'/'.$file.'">'.$file.'</a>&nbsp;&nbsp;<!--<a href="'.route('fb.action',['ext'=>'file','action'=>'delete']).'">удалить</a>-->';
+                if ( empty($file) || !file_exists($path.'/'.$file ) ){
+                    continue;
+                }
+                $hash = md5( filesize($path.'/'.$file) );
+                $elements.='
+
+                  <div class="col-xs-6 col-md-2">
+                    <a target="_blank" class="thumbnail" href="'.$url.'/'.$file.'"><img src="'.$url.'/'.$file.'" style="width:60px;"></a>
+                     <p><a href="javascript:void(0)" class="btn btn-danger" role="button" data-delete-file="'.$file.'" data-hash-file="'.$hash.'" data-path-file="'.$this->config['data-path'].'">Удалить файл</a> </p>
+                  </div>
+
+               ';
             }
-            $elements.='<br/><input style="display:none" type="file"  '.$attrs.' />';
+            $elements.='</div><br/><div><input style="display:none" type="file"  '.$attrs.' /></div>';
         }elseif( !empty($files) && file_exists($path.'/'.$files) ){
             $hash = md5( filesize($path.'/'.$files) );
             $elements.='<div class="row">
-              <div class="col-xs-6 col-md-3">
+              <div class="col-xs-6 col-md-2">
                 <a target="_blank" class="thumbnail" href="'.$url.'/'.$files.'"><img src="'.$url.'/'.$files.'" style="width:60px;"></a>
                  <p><a href="javascript:void(0)" class="btn btn-danger" role="button" data-delete-file="'.$files.'" data-hash-file="'.$hash.'" data-path-file="'.$this->config['data-path'].'">Удалить файл</a> </p>
               </div>
@@ -75,6 +89,11 @@ class File extends \Nifus\FormBuilder\Fields{
     }
     public function setPath($path){
         $this->config['data-path'] = $path;
+        return $this;
+    }
+
+    public function setCountFiles($count){
+        $this->config['data-count-files'] = $count;
         return $this;
     }
 }
