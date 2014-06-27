@@ -1,11 +1,24 @@
 <script>
 
     $(function () {
-
-            CKEDITOR.replace( '{{$id}}' );
+            CKEDITOR.replace( '{{$id}}',{
+                language : 'ru',
+                extraPlugins : 'base64image',
+                //toolbar : 'Basic',
+                @if ( isset($config['toolbar']) )
+                    toolbar :{{$config['toolbar']}}
+                @endif
+            } );
             CKEDITOR.editorConfig = function( config ) {
-                config.language = 'ru';
-                config.extraPlugins = 'base64image';
+
+
+                /*
+                config.toolbar = [
+                    [ 'Source', '-', 'NewPage', 'Preview', '-', 'Templates' ],
+                    [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ],
+                    '/',
+                    [ 'Bold', 'Italic' ]
+                ];*/
             };
 
         $('#edit_save_button').click(function(){
