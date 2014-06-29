@@ -21,12 +21,6 @@
                             }
                             return false;
                         },
-                        select_city : function() {
-                            if ( $('#filing_city_id').val()=='' ){
-                                return false;
-                            }
-                            return true;
-                        },
                         select_value : function() {
                             if ( $(this).val()=='' ){
                                 return false;
@@ -49,8 +43,10 @@
                 if (json && json.error) {
                         $('#{{$formName}}Message').html(json.error).show().removeClass('hide').addClass('alert-danger').addClass('alert-success');
                         $('#{{$formName}} [name=' + json.field + ']').focus();
+                        $( "body" ).trigger( "ajax.answer",['{{$formName}}',true, json.msg] );
                     } else if (json && json.msg) {
                         $('#{{$formName}}Message').html(json.msg).show().removeClass('hide').addClass('alert-success').addClass('alert-danger');
+                        $( "body" ).trigger( "ajax.answer",['{{$formName}}',false, json.msg] );
                 } else if (json && json.url) {
                        window.location = json.url;
                     } else {
@@ -59,7 +55,9 @@
                 },
                 'error': function (event, jqXHR, ajaxSettings) {
                     $('#{{$formName}}Message').html(json.ajaxSettings).show().removeClass('hide');
-                    return false;
+                    //$( "body" ).trigger( "ajax.answer",['form_id':'{{$formName}}','error':true,'answer':json.ajaxSettings] );
+
+                return false;
                 }
             }
             $("#{{$formName}}").ajaxForm(options);
