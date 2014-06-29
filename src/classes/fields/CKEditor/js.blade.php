@@ -4,6 +4,8 @@
             CKEDITOR.replace( '{{$id}}',{
                 language : 'ru',
                 extraPlugins : 'base64image',
+                allowedContent : true,
+
                 //toolbar : 'Basic',
                 @if ( isset($config['toolbar'])  )
                     toolbar :{{$config['toolbar']}}
