@@ -51,6 +51,7 @@
                         $('#{{$formName}} [name=' + json.field + ']').focus();
                     } else if (json && json.msg) {
                         $('#{{$formName}}Message').html(json.msg).show().removeClass('hide').addClass('alert-success').addClass('alert-danger');
+                        $("body").trigger("save_form", [json.id ] );
                 } else if (json && json.url) {
                        window.location = json.url;
                     } else {
