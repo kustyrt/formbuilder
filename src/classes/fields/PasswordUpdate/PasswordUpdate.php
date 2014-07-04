@@ -11,9 +11,7 @@ class PasswordUpdate extends \Nifus\FormBuilder\Fields{
 
     public function __construct($typeField,$name='',array $config,$builder){
         \Nifus\FormBuilder\Render::jsAdd('password','PasswordUpdate');
-
         parent::__construct($typeField,$name,$config,$builder);
-
     }
 
     public function renderElement($response){
@@ -24,10 +22,6 @@ class PasswordUpdate extends \Nifus\FormBuilder\Fields{
 
         $elements='<input type="password"  '.$attrs.' />';
         return $elements;
-
-
-
-
     }
 
 

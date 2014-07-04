@@ -59,7 +59,6 @@ class Fields
     {
         $this->value =  $value ;
        // $this->set('data-value',$value);
-        \Log::info($value);
         return $this;
     }
 

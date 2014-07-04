@@ -202,7 +202,6 @@ class Response{
         }
         }catch ( \Exception $e ){
             $this->builder->setError( $e->getMessage()  );
-            \Log::info($e);
             return false;
         }
         return $model;
