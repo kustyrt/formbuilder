@@ -46,6 +46,7 @@
                         $( "body" ).trigger( "ajax.answer",['{{$formName}}',true, json.msg] );
                     } else if (json && json.msg) {
                         $('#{{$formName}}Message').html(json.msg).show().removeClass('hide').addClass('alert-success').addClass('alert-danger');
+                        $("body").trigger("save_form", [json.id ] );
                         $( "body" ).trigger( "ajax.answer",['{{$formName}}',false, json.msg] );
                 } else if (json && json.url) {
                        window.location = json.url;
