@@ -15,10 +15,15 @@ class PasswordUpdate extends \Nifus\FormBuilder\Fields{
     }
 
     public function renderElement($response){
+        $attrs = $this->renderAttrs();
+
         if ( !$response->isCreate() ){
             $this->config['data-value-exists']=1;
+            $attrs = $this->renderAttrs();
+            if (isset($attrs['data-required']) ){
+                unset($attrs['data-required']);
+            }
         }
-        $attrs = $this->renderAttrs();
 
         $elements='<input type="password"  '.$attrs.' />';
         return $elements;
