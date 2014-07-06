@@ -100,26 +100,27 @@ class Response{
                         continue;
                     }
                 }
-                if( isset($config['upload']) && true===$config['upload'] && \Input::hasFile($config['name']) ){
-                    $result[$name]=$this->uploadFiles($config);
-                    if ( is_array($result[$name]) ){
-                        foreach($result[$name] as $file ){
+                if( isset($config['upload']) && true===$config['upload']  && isset($_FILES[$config['name']])){
+                    if (  \Input::hasFile($config['name']) ){
+                        $result[$name]=$this->uploadFiles($config);
+                        if ( is_array($result[$name]) ){
+                            foreach($result[$name] as $file ){
+                                if ( isset($config['width']) && isset($config['height']) ){
+                                    $destination_path =  public_path().'/'.$config['data-path'];
+                                    $this->resizeImage($destination_path.'/'.$file,$config['width'],$config['height']);
+                                }
+                            }
+                        }elseif( !empty($result[$name]) ){
                             if ( isset($config['width']) && isset($config['height']) ){
                                 $destination_path =  public_path().'/'.$config['data-path'];
-                                $this->resizeImage($destination_path.'/'.$file,$config['width'],$config['height']);
+                                $this->resizeImage($destination_path.'/'.$result[$name],$config['width'],$config['height']);
                             }
-                        }
-                    }elseif( !empty($result[$name]) ){
-                        if ( isset($config['width']) && isset($config['height']) ){
-                            $destination_path =  public_path().'/'.$config['data-path'];
-                            $this->resizeImage($destination_path.'/'.$result[$name],$config['width'],$config['height']);
+                        }else{
+                            throw new \Exception('Неудалось загрузить файлы');
                         }
                     }else{
-
-
-                        throw new \Exception('Неудалось загрузить файлы');
+                        $result[$name]='';
                     }
-
                 }elseif( !isset($config['upload']) ){
                     $result[$name]=$this->findResponseData4Key($name);
                 }

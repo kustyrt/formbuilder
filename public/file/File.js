@@ -25,13 +25,15 @@ $(function () {
 
             var group = $(this).parents('div.control-group');
             var files = group.find('div.col-md-2').length;
+
+
             if (limit!=0 && limit>=files){
-                $(this).hide();
+                $(this).hide().attr('disabled','disabled');
             }else{
                 if ( multiple==undefined && files>0 ){
-                    $(this).hide();
+                    $(this).hide().attr('disabled','disabled');
                 }else{
-                    $(this).show();
+                    $(this).show().removeAttr('disabled');
                 }
             }
         });
@@ -41,16 +43,16 @@ $(function () {
     $('input[data-count-files]').each(function(){
         var limit = $(this).attr('data-count-files');
         var multiple = $(this).attr('multiple');
-
         var group = $(this).parents('div.control-group');
         var files = group.find('div.col-md-2').length;
+
         if (limit!=0 && limit>=files){
-            $(this).hide();
+            $(this).hide().attr('disabled','disabled');
         }else{
             if ( multiple==undefined && files>0 ){
-                $(this).hide();
+                $(this).hide().attr('disabled','disabled');
             }else{
-                $(this).show();
+                $(this).show().removeAttr('disabled');
             }
         }
     });

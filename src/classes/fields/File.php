@@ -52,7 +52,7 @@ class File extends \Nifus\FormBuilder\Fields{
                  <p><a href="javascript:void(0)" class="btn btn-danger" role="button" data-delete-file="'.$files.'" data-hash-file="'.$hash.'" data-path-file="'.$this->config['data-path'].'">Удалить файл</a> </p>
               </div>
 
-              </div><br/><input style="display:none" type="file"  '.$attrs.' />';
+              </div><br/><input style="display:none" disabled type="file"  '.$attrs.' />';
         }else{
             $elements='<input type="file"  '.$attrs.' />';
         }
