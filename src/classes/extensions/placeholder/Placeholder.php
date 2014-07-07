@@ -11,10 +11,12 @@ class Placeholder extends Extension{
 
 
     public function configField($config){
-        if ( !isset($config['placeholder']) && isset($config['label'])  ){
+        if ( !isset($config['placeholder']) && isset($config['label']) &&  !is_null($config['label']) ){
             return ['placeholder'=>$config['label']];
-        }else{
+        }elseif ( isset($config['placeholder']) ){
             return ['placeholder'=>$config['placeholder']];
+        }else{
+            return [];
         }
     }
 
