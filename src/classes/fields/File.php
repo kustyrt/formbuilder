@@ -24,7 +24,7 @@ class File extends \Nifus\FormBuilder\Fields{
         $url = 'http://'.$_SERVER['HTTP_HOST'].'/'.$this->config['data-path'];
         $elements = '';
         $attrs = $this->renderAttrs();
-        $files = $response->getData($this->config['name']);
+        $files = $response->getModelData($this->config['name']);
 
         if ( is_array($files) ){
             $elements.='

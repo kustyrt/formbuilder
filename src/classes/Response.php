@@ -358,7 +358,7 @@ class Response{
         return false;
     }
 
-    protected function getModelData($key){
+    public function getModelData($key){
 
         $model= $this->builder->model;
 
