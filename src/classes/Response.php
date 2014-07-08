@@ -132,9 +132,17 @@ class Response
 
                 }
             }
-
+            $model->fio=1212;
+            $model->update();
             $model->save();
+            if (!is_null($id)) {
+                $model->update();
+                \Event::fire('fb.'.$this->builder->form_name.'.update', array($model));
+            }else{
+                $model->save();
+                \Event::fire('fb.'.$this->builder->form_name.'.save', array($model));
 
+            }
             $id = $model->getKey();
 
             foreach ($fields as $area) {
