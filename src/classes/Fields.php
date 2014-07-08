@@ -113,7 +113,7 @@ class Fields
             throw new ConfigException('Не указан тип поля для данных ' . var_export($this->config,true));
         }*/
         //  подключаем правила доп полей.
-        if ( !isset($this->config['label']) &&  !is_null($this->config['label']) ){
+        if ( !isset($this->config['label'])  ){
             $this->config['label'] = isset($this->config['title']) ? $this->config['title']  : trans($this->config['name']);
         }
 
