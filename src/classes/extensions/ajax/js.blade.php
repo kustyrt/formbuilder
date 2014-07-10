@@ -52,7 +52,7 @@
                             $( document ).trigger( "ajax.answer.{{$formName}}",[json] );
                     } else if (json && json.url) {
                            window.location = json.url;
-                    } else if (json && json.reload{
+                    } else if (json && json.reload){
                         window.location.reload(true);
                     } else{
                         $( document ).trigger( "ajax.answer.{{$formName}}",[json] );
