@@ -132,7 +132,7 @@ class Response
 
                 }
             }
-           
+
             if (!is_null($id)) {
                 $model->update();
                 \Event::fire('fb.'.$this->builder->form_name.'.update', array($model));

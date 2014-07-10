@@ -40,18 +40,22 @@
                 'dataType': 'json',
                 'type': 'post',
                 'success': function (json) {
-                if (json && json.error) {
-                        $('#{{$formName}}Message').html(json.error).show().removeClass('hide').addClass('alert-danger').addClass('alert-success');
-                        $('#{{$formName}} [name=' + json.field + ']').focus();
-                        $( "body" ).trigger( "ajax.answer",['{{$formName}}',true, json.msg] );
+                    if (json && json.error) {
+                            $('#{{$formName}}Message').html(json.error).show().removeClass('hide').addClass('alert-danger').addClass('alert-success');
+                            $('#{{$formName}} [name=' + json.field + ']').focus();
+                            $( document ).trigger( "ajax.answer.{{$formName}}",[json] );
+                            $(document ).trigger( "ajax.answer",['{{$formName}}',true, json] );
                     } else if (json && json.msg) {
-                        $('#{{$formName}}Message').html(json.msg).show().removeClass('hide').addClass('alert-success').addClass('alert-danger');
-                        $("body").trigger("save_form", [json.id ] );
-                        $( "body" ).trigger( "ajax.answer",['{{$formName}}',false, json.msg] );
-                } else if (json && json.url) {
-                       window.location = json.url;
-                    } else {
+                            $('#{{$formName}}Message').html(json.msg).show().removeClass('hide').addClass('alert-success').addClass('alert-danger');
+                            $( document).trigger("save_form", [json.id ] );
+                            $( document ).trigger( "ajax.answer",['{{$formName}}',false, json] );
+                            $( document ).trigger( "ajax.answer.{{$formName}}",[json] );
+                    } else if (json && json.url) {
+                           window.location = json.url;
+                    } else if (json && json.reload{
                         window.location.reload(true);
+                    } else{
+                        $( document ).trigger( "ajax.answer.{{$formName}}",[json] );
                     }
                 },
                 'error': function (event, jqXHR, ajaxSettings) {

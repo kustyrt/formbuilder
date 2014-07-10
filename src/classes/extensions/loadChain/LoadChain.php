@@ -19,13 +19,6 @@ class LoadChain extends Extension
     public function loadAsset()
     {
 
-        //$config = $this->builder->load_chain;
-
-
-        /*if (!isset($config) || !is_array($config)) {
-            return false;
-        }*/
-
         $v = \View::make('formbuilder::classes/extensions/loadChain/js') ->with('id_form', $this->builder->form_name );
 
         \Nifus\FormBuilder\Render::setJs($v->render(), $v->getPath());
