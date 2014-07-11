@@ -43,19 +43,19 @@
                     if (json && json.error) {
                             $('#{{$formName}}Message').html(json.error).show().removeClass('hide').addClass('alert-danger').addClass('alert-success');
                             $('#{{$formName}} [name=' + json.field + ']').focus();
-                            $( document ).trigger( "ajax.answer.{{$formName}}",[json] );
+                            $( document ).trigger( "{{$formName}}.ajax.answer",[json] );
                             $(document ).trigger( "ajax.answer",['{{$formName}}',true, json] );
                     } else if (json && json.msg) {
                             $('#{{$formName}}Message').html(json.msg).show().removeClass('hide').addClass('alert-success').addClass('alert-danger');
                             $( document).trigger("save_form", [json.id ] );
                             $( document ).trigger( "ajax.answer",['{{$formName}}',false, json] );
-                            $( document ).trigger( "ajax.answer.{{$formName}}",[json] );
+                            $( document ).trigger( "{{$formName}}.ajax.answer",[json] );
                     } else if (json && json.url) {
                            window.location = json.url;
                     } else if (json && json.reload){
                         window.location.reload(true);
                     } else{
-                        $( document ).trigger( "ajax.answer.{{$formName}}",[json] );
+                        $( document ).trigger( "{{$formName}}.ajax.answer",[json] );
                     }
                 },
                 'error': function (event, jqXHR, ajaxSettings) {
