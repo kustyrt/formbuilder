@@ -237,11 +237,16 @@ class FormBuilder
     }
 
     /**
-     *  обработка формы
+     * @param string $method config|data сохранять данные на основе кофнига или данных поступаемых из формы
+     * @param string $format save|create
+     * @return bool|\Illuminate\Database\Eloquent\Model|null
      */
-    function save()
+    function save($method='config',$format='save')
     {
         $response = new Response($this);
+        $response->setMethod($method);
+        $response->setFormat($format);
+
         return $response->save($this->fields);
     }
 

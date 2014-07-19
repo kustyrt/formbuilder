@@ -7,11 +7,22 @@ use Whoops\Example\Exception;
 class Response
 {
 
-    private $builder, $model = false;
+    private
+        $method = 'config',
+        $format = 'save',
+        $builder, $model = false;
 
     function __construct($builder)
     {
         $this->builder = $builder;
+    }
+
+    function setMethod($method){
+        $this->method=$method;
+    }
+
+    function setFormat($format){
+        $this->format=$format;
     }
 
     /**
@@ -61,78 +72,98 @@ class Response
         return true;
     }
 
+    private function getModel(){
+        $id = $this->findResponseData4Key($this->builder->form_name . '_formbuilderid');
+        $model = $this->builder->model;
+
+        if (!is_null($id)) {
+            $model = $model::find($id);
+        } else {
+            $model = new $model();
+        }
+
+        return $model;
+    }
+
+    private function getDataValue($config){
+
+        $config = $config['config'];
+
+        $name = $config['name'] = preg_replace('#\[\]#', '', $config['name']);
+
+        if (empty($name)) {
+            return null;
+        }
+
+        if (isset($config['data']['method'])) {
+            if (!isset($config['data']['class'])) {
+                $object = new $this->builder->model;
+            } else {
+                $object = new $config['data']['class'];
+            }
+            $f = $object->$config['data']['method']();
+
+            //  пропускаем
+            if ($f instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany) {
+                return null;
+            }
+            if ($f instanceof \Illuminate\Database\Eloquent\Relations\HasMany) {
+                return null;
+            }
+        }
+
+        if (isset($config['upload']) && true === $config['upload'] && isset($_FILES[$config['name']])) {
+            if (\Input::hasFile($config['name'])) {
+                $name = $this->uploadFiles($config);
+                if (is_array($name)) {
+                    foreach ($name as $file) {
+                        if (isset($config['width']) && isset($config['height'])) {
+                            $destination_path = public_path() . '/' . $config['data-path'];
+                            $this->resizeImage($destination_path . '/' . $file, $config['width'], $config['height']);
+                        }
+                    }
+                } elseif (!empty($name)) {
+                    if (isset($config['width']) && isset($config['height'])) {
+                        $destination_path = public_path() . '/' . $config['data-path'];
+                        $this->resizeImage($destination_path . '/' . $name, $config['width'], $config['height']);
+                    }
+                } else {
+                    throw new \Exception('Неудалось загрузить файлы');
+                }
+                return $name;
+            } else {
+                return  '';
+            }
+        } elseif (!isset($config['upload'])) {
+            return $this->findResponseData4Key($name);
+        }
+    }
+
+
     /**
      *
      */
     function save($fields)
     {
-
-        $model = null;
-        $data_config = $this->builder->data;
-        $id = $this->findResponseData4Key($this->builder->form_name . '_formbuilderid');
-        if (!is_null($id)) {
-            $model = $this->builder->model;
-            $model = $model::find($id);
-        } else {
-            $model = $this->builder->model;
-            $model = new $model();
+        $model = $this->getModel();
+        if ( is_null($model) ){
+            throw new Exception('Модель не найдена');
         }
-
-
+        $data_config = $this->builder->data;
         try {
             $result = [];
             foreach ($fields as $area) {
                 foreach ($area['fields'] as $name => $config) {
-                    $config = $config['config'];
-                    $name = $config['name'] = preg_replace('#\[\]#', '', $config['name']);
-                    if (empty($name)) {
+
+                    $value = $this->getDataValue($config);
+
+                    if ( is_null($value) ){
                         continue;
                     }
-
-                    if (isset($config['data']['method'])) {
-                        if (!isset($config['data']['class'])) {
-                            $object = new $this->builder->model;
-                        } else {
-                            $object = new $config['data']['class'];
-                        }
-                        $f = $object->$config['data']['method']();
-
-                        //  пропускаем
-                        if ($f instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany) {
-                            continue;
-                        }
-                        if ($f instanceof \Illuminate\Database\Eloquent\Relations\HasMany) {
-                            continue;
-                        }
-                    }
-                    if (isset($config['upload']) && true === $config['upload'] && isset($_FILES[$config['name']])) {
-                        if (\Input::hasFile($config['name'])) {
-                            $model->$name = $this->uploadFiles($config);
-                            if (is_array($model->$name)) {
-                                foreach ($model->$name as $file) {
-                                    if (isset($config['width']) && isset($config['height'])) {
-                                        $destination_path = public_path() . '/' . $config['data-path'];
-                                        $this->resizeImage($destination_path . '/' . $file, $config['width'], $config['height']);
-                                    }
-                                }
-                            } elseif (!empty($model->$name)) {
-                                if (isset($config['width']) && isset($config['height'])) {
-                                    $destination_path = public_path() . '/' . $config['data-path'];
-                                    $this->resizeImage($destination_path . '/' . $model->$name, $config['width'], $config['height']);
-                                }
-                            } else {
-                                throw new \Exception('Неудалось загрузить файлы');
-                            }
-                        } else {
-                            $model->$name = '';
-                        }
-                    } elseif (!isset($config['upload'])) {
-                        $model->$name = $this->findResponseData4Key($name);
-                    }
-
+                    $model->$name = $value;
                 }
             }
-
+            $id = $model->getKey();
             if (!is_null($id)) {
                 $model->update();
                 \Event::fire('fb.'.$this->builder->form_name.'.update', array($model));
@@ -141,79 +172,87 @@ class Response
                 \Event::fire('fb.'.$this->builder->form_name.'.save', array($model));
 
             }
-            $id = $model->getKey();
+           // $this->saveBelongsToMany($fields,$model);
+           // $this->saveHasMany($fields,$model);
 
-            foreach ($fields as $area) {
-                foreach ($area['fields'] as $name => $config) {
-                    $config = $config['config'];
-                    if (isset($config['data']['method'])) {
-                        $f = $model->$config['data']['method']();
-                        //  пропускаем
-                        if (!$f instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany) {
-                            continue;
-                        }
-                        $key = $f->getForeignKey();
-                        $prime_key = $f->getOtherKey();
-                        $rows = $this->findResponseData4Key($name);
-                        $inc = [];
-                        if (is_array($rows)) {
-                            foreach ($rows as $v) {
-                                $inc[$id][] = $v;
-                            }
-                            foreach ($inc as $id_model => $keys) {
-                                $f = $model::find($id_model);
-                                $f->$config['data']['method']()->sync([]);
-                                $f->$config['data']['method']()->sync($keys);
-                            }
-                        }
-                    }
-                }
-            }
-
-
-            //  Один ко многим
-            foreach ($fields as $area) {
-                foreach ($area['fields'] as $name => $config) {
-                    $config = $config['config'];
-                    if (isset($config['data']['method'])) {
-                        $f = $model->$config['data']['method']();
-                        //  пропускаем
-                        if (!$f instanceof \Illuminate\Database\Eloquent\Relations\HasMany) {
-                            continue;
-                        }
-
-                        $key = $f->getPlainForeignKey();
-                        $model = $f->getRelated();
-                        $class_name = get_class($model);
-
-                        $rows = $this->findResponseData4Key($name);
-                        $o = $class_name::where($key, $id)->get();
-                        foreach ($o as $obj) {
-                            $obj->delete();
-                        }
-
-
-                        $inc = [];
-                        if (is_array($rows)) {
-                            foreach ($rows as $v => $values) {
-                                foreach ($values as $i => $value) {
-                                    $inc[$i][$v] = $value;
-                                    $inc[$i][$key] = $id;
-                                }
-                            }
-
-                            foreach ($inc as $array) {
-                                $class_name::create($array);
-                            }
-                        }
-                    }
-                }
-            }
         } catch (\Exception $e) {
             $this->builder->setError($e->getMessage());
             return false;
         }
         return $model;
+    }
+
+    private function saveHasMany($fields,$model){
+        $id = $model->getKey();
+        //  Один ко многим
+        foreach ($fields as $area) {
+            foreach ($area['fields'] as $name => $config) {
+                $config = $config['config'];
+                if (isset($config['data']['method'])) {
+                    $f = $model->$config['data']['method']();
+                    //  пропускаем
+                    if (!$f instanceof \Illuminate\Database\Eloquent\Relations\HasMany) {
+                        continue;
+                    }
+
+                    $key = $f->getPlainForeignKey();
+                    $model = $f->getRelated();
+                    $class_name = get_class($model);
+
+                    $rows = $this->findResponseData4Key($name);
+                    $o = $class_name::where($key, $id)->get();
+                    foreach ($o as $obj) {
+                        $obj->delete();
+                    }
+
+
+                    $inc = [];
+                    if (is_array($rows)) {
+                        foreach ($rows as $v => $values) {
+                            foreach ($values as $i => $value) {
+                                $inc[$i][$v] = $value;
+                                $inc[$i][$key] = $id;
+                            }
+                        }
+
+                        foreach ($inc as $array) {
+                            $class_name::create($array);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private function saveBelongsToMany($fields,$model){
+        $id = $model->getKey();
+
+        foreach ($fields as $area) {
+            foreach ($area['fields'] as $name => $config) {
+                $config = $config['config'];
+                if (isset($config['data']['method'])) {
+                    $f = $model->$config['data']['method']();
+                    //  пропускаем
+                    if (!$f instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany) {
+                        continue;
+                    }
+                    $key = $f->getForeignKey();
+                    $prime_key = $f->getOtherKey();
+                    $rows = $this->findResponseData4Key($name);
+                    $inc = [];
+                    if (is_array($rows)) {
+                        foreach ($rows as $v) {
+                            $inc[$id][] = $v;
+                        }
+                        foreach ($inc as $id_model => $keys) {
+                            $f = $model::find($id_model);
+                            $f->$config['data']['method']()->sync([]);
+                            $f->$config['data']['method']()->sync($keys);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private function resizeImage($file, $width, $height)
