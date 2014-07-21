@@ -172,8 +172,8 @@ class Response
                 \Event::fire('fb.'.$this->builder->form_name.'.save', array($model));
 
             }
-           // $this->saveBelongsToMany($fields,$model);
-           // $this->saveHasMany($fields,$model);
+           $this->saveBelongsToMany($fields,$model);
+           $this->saveHasMany($fields,$model);
 
         } catch (\Exception $e) {
             $this->builder->setError($e->getMessage());
