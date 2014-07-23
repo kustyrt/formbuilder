@@ -14,7 +14,6 @@ class Ajax extends Validetta
     {
        // \Nifus\FormBuilder\Render::jsAdd('jquery');
         \Nifus\FormBuilder\Render::jsAdd('jquery.form','ajax');
-
         // валидация
         \Nifus\FormBuilder\Render::jsAdd('jquery.validate.min', 'validate');
         $lang = \App::getLocale();

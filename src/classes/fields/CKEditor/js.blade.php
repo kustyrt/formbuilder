@@ -15,7 +15,7 @@
             } );
 
 
-        $('#edit_save_button').click(function(){
+        $('button[data-id=edit_save_button]').click(function(){
             for ( instance in CKEDITOR.instances ){
                 CKEDITOR.instances[instance].updateElement();
             }
