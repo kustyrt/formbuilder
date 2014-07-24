@@ -112,30 +112,50 @@ class FormBuilder
 
 
     /**
-     * @param $method
+     * Set HTTP Method
+     *
+     * @param $method  GET/POST
      * @return $this
+     * @throws \Exception
      */
     public  function setMethod($method){
+        $method = strtolower($method);
         if ( empty($method) ){
             $method = 'post';
+        }
+        if ( !in_array($method,['post','get']) ){
+            throw new \Exception('');
         }
         return $this->set('method',$method);
     }
 
 
     /**
+     * Set form action
+     *
      * @param $action
-     * @return mixed
+     * @return $this
+     * @throws \Exception
      */
     public function setAction($action){
+        if ( empty($action) ){
+            throw new \Exception('');
+        }
         return $this->set('action',$action);
     }
 
-
-    public function setEnctype($enctype){
+    /**
+     * @param $enctype
+     * @return $this
+     */
+    public function setEnctype($enctype=null){
+        if ( is_null($enctype) ){
+            return $this;
+        }
         if ( empty($enctype) ){
             $enctype = 'multipart/form-data';
         }
+
         return $this->set('enctype',$enctype);
     }
 
