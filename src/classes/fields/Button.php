@@ -9,7 +9,7 @@ namespace Nifus\FormBuilder\Fields;
  */
 class Button extends \Nifus\FormBuilder\Fields{
 
-    protected $config=['name'=>'se'];
+    protected $config=[];
 
 
     public function setValue($value)
@@ -18,11 +18,17 @@ class Button extends \Nifus\FormBuilder\Fields{
         return $this;
     }
 
+    public function renderLabel(){
+        if ( empty($this->config['label']) ){
+            return false;
+        }
+       return parent::renderLabel();
+    }
 
     public function renderElement($response){
         $attrs = $this->renderAttrs();
-
-        return '<button '.$attrs.'>'.$this->config['value'].'</button>';
+        $value = isset($this->config['value']) ? $this->config['value'] : '';
+        return '<button '.$attrs.'>'.$value.'</button>';
     }
 
 
