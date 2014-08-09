@@ -117,7 +117,7 @@ class Fields
             $this->config['label'] = isset($this->config['title']) ? $this->config['title']  : trans($this->config['name']);
         }
 
-        $this->config['id'] = isset($this->config['id']) ? $this->config['id'] :   'id_'.$this->clear($this->config['name']);
+        $this->config['id'] = isset($this->config['id']) ? $this->config['id'] :   'id_'.$this->clear($this->config['name']).'_'.rand(1,1000);
         return ['type'=>$this->typeField,'name'=>$this->config['name'],'config'=>$this->config];
     }
 
