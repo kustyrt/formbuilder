@@ -331,7 +331,7 @@ class Response
 
     private function unicName($path, $ext = '')
     {
-        $base = time();
+        $base = time().rand(1,100);
         while (2 < 3) {
             $new = (isset($ext)) ? $path . '/' . $base . '.' . $ext : $path . '/' . $base;
             if (!file_exists($new)) {
