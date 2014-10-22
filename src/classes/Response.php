@@ -156,7 +156,9 @@ class Response
                 foreach ($area['fields'] as $name => $config) {
 
                     $value = $this->getDataValue($config);
-
+                    
+                    $name = preg_replace('#\[\]#', '', $name);
+                    
                     if ( is_null($value) ){
                         continue;
                     }
