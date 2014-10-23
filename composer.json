@@ -1,10 +1,10 @@
 {
-    "name": "nifus/formbuilder",
+    "name": "kustyrt/formbuilder",
     "description": "",
     "authors": [
         {
-            "name": "nifus",
-            "email": "nifus@mail.ru"
+            "name": "kustyrt",
+            "email": "kustyrt@gmail.com"
         }
     ],
     "require": {
