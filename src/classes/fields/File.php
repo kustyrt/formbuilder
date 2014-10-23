@@ -10,6 +10,21 @@ class File extends \Nifus\FormBuilder\Fields{
     ];
 
     static function delete(){
+        
+        // Удаление имени файла из таблицы "Операционные компании"
+        $company = \Gts\OperationCompany::whereRaw("MATCH(images,stamps) AGAINST(? IN BOOLEAN MODE)", array($_POST['file']))->get();
+        foreach ($company as $company){
+            if($company->images == $_POST['file']){
+                $model = \Gts\OperationCompany::find($company->id);
+                $model->images = null;
+                $model->save();
+            }else{
+                $model = \Gts\OperationCompany::find($company->id);
+                $model->deleteStampsAttribute($_POST['file']);
+                $model->save();
+            }
+        }
+        
         $path = public_path().'/'.$_POST['path'];
         if ( md5( filesize($path.'/'.$_POST['file']) )==$_POST['hash'] ){
             unlink($path.'/'.$_POST['file']);
